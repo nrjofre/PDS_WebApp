@@ -2,5 +2,29 @@
 {% block content %}
 
     <h1>Home Page</h1>
+    <div id="konva-holder">
+        
+    </div>
+    <script>
+        let stage = new Konva.Stage({
+            height: 600,
+            width: 600,
+            container: "konva-holder",
+        });
+        let layer = new Konva.Layer();
+        stage.add(layer);
+
+        let rect = new Konva.Rect({
+            x: 100,
+            y: 100,
+            fill: "blue",
+            width: 200,
+            height: 100,
+        });
+        layer.add(rect);
+        layer.draw();
+
+        
+    </script>
 
 {% endblock %}

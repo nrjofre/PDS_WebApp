@@ -18,6 +18,7 @@
             container: "konva-holder",
         });
         stage.getContainer().style.border = '1px solid black';
+
         let layer = new Konva.Layer();
         stage.add(layer);
 
@@ -37,13 +38,12 @@
             if (e.target.attrs.name === "bar"){
                 console.log("bar clicked.");
                 tr = new Konva.Transformer({
+                    nodes: [e.target],
                     name: "Transformer",
                     anchorStroke: 'red',
                     anchorFill: 'lightblue',
                     anchorSize: 5,
-                    borderStroke: 'green',
-                    borderDash: [2, 2],
-                    nodes: [e.target],
+                    ignoreStroke: true,
                 });
                 layer.add(tr);
                 transformers.push(tr);
@@ -69,6 +69,8 @@
                 height: barShape,
                 fill: "lightblue",
                 stroke: "black",
+                strokeWidth: 2,
+                strokeScaleEnabled: false,
                 draggable: true,
             });
             

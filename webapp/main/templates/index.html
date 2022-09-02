@@ -6,24 +6,60 @@
         
     </div>
     <script>
+        let canvasHeight = 600;
+        let canvasWidth = 700;
+
         let stage = new Konva.Stage({
-            height: 600,
-            width: 600,
+            height: canvasHeight,
+            width: canvasWidth,
             container: "konva-holder",
         });
         let layer = new Konva.Layer();
         stage.add(layer);
 
         let rect = new Konva.Rect({
-            x: 100,
-            y: 100,
-            fill: "blue",
-            width: 200,
-            height: 100,
+            stroke: "black",
+            width: canvasWidth,
+            height: canvasHeight,
         });
         layer.add(rect);
         layer.draw();
 
+        let bar = null;
+        let isDrawing = false;
+
+        stage.on("mousedown", mousedownHandler);
+        stage.on("mousemove", mousemoveHandler);
+        stage.on("mouseup", mouseupHandler);
+
+        let clickPositionX = null;
+        let clickPositionY = null;
+        function mousedownHandler(){
+            isDrawing = true;
+            clickPositionX = stage.getPointerPosition().x,
+            clickPositionY = stage.getPointerPosition().y,
+            bar = new Konva.Rect({
+                x: clickPositionX,
+                y: clickPositionY,
+                width: 20,
+                height: 20,
+                fill: "lightblue",
+                stroke: "black",
+            });
+            layer.add(bar).batchDraw();
+        }
+
+        function mouseupHandler(){
+            isDrawing = false;
+        }
+
+        function mousemoveHandler(){
+            if (!isDrawing) return false;
+            const newWidth = stage.getPointerPosition().x - bar.x();
+            const newHeight = stage.getPointerPosition().y - bar.y();
+            bar.width(newWidth).height(newHeight);
+            layer.batchDraw();
+        }
         
     </script>
 

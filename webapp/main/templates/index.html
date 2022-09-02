@@ -6,8 +6,11 @@
         
     </div>
     <script>
-        let canvasHeight = 600;
-        let canvasWidth = 700;
+        const canvasHeight = 600;
+        const canvasWidth = 700;
+        const barShape = 20;
+        const barThickness = barShape/2;
+        let transformers = [];
 
         let stage = new Konva.Stage({
             height: canvasHeight,
@@ -17,34 +20,58 @@
         let layer = new Konva.Layer();
         stage.add(layer);
 
-        let rect = new Konva.Rect({
-            stroke: "black",
-            width: canvasWidth,
-            height: canvasHeight,
-        });
-        layer.add(rect);
-        layer.draw();
+        // let rect = new Konva.Rect({
+        //     stroke: "black",
+        //     width: canvasWidth,
+        //     height: canvasHeight,
+        // });
+        // layer.add(rect);
+        // layer.draw();
 
         let bar = null;
         let isDrawing = false;
 
         stage.on("dblclick", doubleclickHandler);
-        stage.on("mousemove", mousemoveHandler);
-        stage.on("mouseup", mouseupHandler);
+        stage.on("click", (e) => {
+            if (e.target.attrs.name === "bar"){
+                console.log("bar clicked.");
+                tr = new Konva.Transformer({
+                    name: "Transformer",
+                    anchorStroke: 'red',
+                    anchorFill: 'lightblue',
+                    anchorSize: 5,
+                    borderStroke: 'green',
+                    borderDash: [2, 2],
+                    nodes: [e.target],
+                });
+                layer.add(tr);
+                transformers.push(tr);
+            }
+            else {
+                transformers.forEach(function (t){
+                t.destroy();
+            })
+            }
+        });
+        // stage.on("mousemove", mousemoveHandler);
+        // stage.on("mouseup", mouseupHandler);
 
         let clickPositionX = null;
         let clickPositionY = null;
         function doubleclickHandler(){
             isDrawing = true;
             bar = new Konva.Rect({
-                x: stage.getPointerPosition().x - 10,
-                y: stage.getPointerPosition().y - 10,
-                width: 20,
-                height: 20,
+                name: "bar",
+                x: stage.getPointerPosition().x - barThickness,
+                y: stage.getPointerPosition().y - barThickness,
+                width: barShape,
+                height: barShape,
                 fill: "lightblue",
                 stroke: "black",
                 draggable: true,
             });
+            
+            // bar.on("click", barClickHandler);
             layer.add(bar).batchDraw();
         }
 
@@ -52,14 +79,17 @@
             isDrawing = false;
         }
 
+
         function mousemoveHandler(){
             if (!isDrawing) return false;
-            const newWidth = stage.getPointerPosition().x - bar.x() + 10;
-            const newHeight = stage.getPointerPosition().y - bar.y() + 10;
+            const newWidth = stage.getPointerPosition().x - bar.x() + barThickness;
+            const newHeight = stage.getPointerPosition().y - bar.y() + barThickness;
             bar.width(newWidth).height(newHeight);
             layer.batchDraw();    
         }
+
         
+
     </script>
 
 {% endblock %}

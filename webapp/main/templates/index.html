@@ -1,34 +1,136 @@
 {% extends 'base.html' %}
 {% block content %}
 
-    <h1>Home Page</h1>
-    <div id="konva-holder">
-        
+<h1>DCL Drawer</h1>
+<div id="konva-holder"> </div>
+    <head>
+        <script src="https://unpkg.com/konva@8.3.12/konva.min.js"></script>
+        <meta charset="utf-8" />
+        <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: #f0f0f0;
+        }
+
+        #menu {
+            display: none;
+            position: absolute;
+            width: 60px;
+            background-color: white;
+            box-shadow: 0 0 5px grey;
+            border-radius: 3px;
+        }
+
+        #menu button {
+            width: 100%;
+            background-color: white;
+            border: none;
+            margin: 0;
+            padding: 10px;
+        }
+
+        #menu button:hover {
+            background-color: lightgray;
+        }
+        </style>
+  </head>
+
+  <body>
+    <div id="container"></div>
+    <div id="menu">
+      <div>
+        <button id="pulse-button">Insert Bar</button
+        ><button id="delete-button">Delete Bar</button>
+      </div>
     </div>
     <script>
         const canvasHeight = 600;
-        const canvasWidth = 700;
+        const canvasWidth = 1010;
         const barShape = 20;
         const barThickness = barShape/2;
+        
         let transformers = [];
 
-        let stage = new Konva.Stage({
-            height: canvasHeight,
-            width: canvasWidth,
-            container: "konva-holder",
+        function drawLinesSolution1(layer){      
+            const stepSize = 15;
+
+            const xSize= stage.width(), 
+                ySize= stage.height(),
+                xSteps = Math.round(xSize/ stepSize), 
+                ySteps = Math.round(ySize / stepSize);
+    
+            // draw vertical lines
+            for (let i = 0; i <= xSteps; i++) {
+            this.layer.add(
+                new Konva.Line({
+                x: i * stepSize,
+                points: [0, 0, 0, ySize],
+                stroke: 'black',
+                strokeWidth: 0.5,
+                })
+            );
+            }
+            //draw Horizontal lines
+            for (let i = 0; i <= ySteps; i++) {
+            this.layer.add(
+                new Konva.Line({
+                y: i * stepSize,
+                points: [0, 0, xSize, 0],
+                stroke: 'black',
+                strokeWidth: 0.5,
+                })
+            );
+            }
+            
+            this.layer.batchDraw();
+        }
+
+        let currentShape;
+        var menuNode = document.getElementById('menu');
+        document.getElementById('delete-button').addEventListener('click', () => {
+            currentShape.destroy();
         });
-        stage.getContainer().style.border = '1px solid black';
 
-        let layer = new Konva.Layer();
-        stage.add(layer);
+        window.addEventListener('click', () => { 
+                menuNode.style.display = 'none'; 
+            }
+        );
 
-        // let rect = new Konva.Rect({
-        //     stroke: "black",
-        //     width: canvasWidth,
-        //     height: canvasHeight,
-        // });
-        // layer.add(rect);
-        // layer.draw();
+        function ctxtmenu(e){
+            e.evt.preventDefault();
+            if (e.target === stage) {
+                return;
+            }
+            currentShape = e.target; // if there is one 
+
+            var containerRect = stage.container().getBoundingClientRect();
+            menuNode.style.width = '150px';
+            menuNode.style.top = containerRect.top + stage.getPointerPosition().y + 4 + 'px';
+            menuNode.style.left = containerRect.left + stage.getPointerPosition().x + 4 + 'px';
+            menuNode.style.display = 'block';
+        };
+        function stage_layer_grid(){
+
+            stage = new Konva.Stage({
+                height: canvasHeight,
+                width: canvasWidth,
+                container: "konva-holder",
+                visible: true,
+            });
+
+            stage.getContainer().style.border = '1px solid black';
+
+            layer = new Konva.Layer();
+            drawLinesSolution1(layer);
+            
+            stage.add(layer);
+            stage.on('contextmenu', ctxtmenu);
+
+        }
+
+        stage_layer_grid();
 
         let bar = null;
         let isDrawing = false;
@@ -78,10 +180,10 @@
             layer.add(bar).batchDraw();
         }
 
+        doubleclickHandler();
         function mouseupHandler(){
             isDrawing = false;
         }
-
 
         function mousemoveHandler(){
             if (!isDrawing) return false;
@@ -91,8 +193,6 @@
             layer.batchDraw();    
         }
 
-        
-
     </script>
-
+  </body>
 {% endblock %}

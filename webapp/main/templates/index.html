@@ -42,9 +42,10 @@
     <div id="menu">
       <div>
         <button id="addBar-button">Insert Bar</button>
-        <button id="delete-button">Delete Bar</button>
-        <button id="add-custom">Custom Object</button>
-        <button id="add-force">Add Force</button>
+        <button id="addSupport-button">Add Support</button>
+        <button id="add-custom">Add Embedment</button>
+        <button id="addForce-button">Add Force</button>
+        <button id="delete-button">Delete Object</button>
       </div>
     </div>
     <script>
@@ -68,6 +69,7 @@
             for (let i = 0; i <= xSteps; i++) {
             this.layer.add(
                 new Konva.Line({
+                name: "grid",
                 x: i * stepSize,
                 points: [0, 0, 0, ySize],
                 stroke: 'black',
@@ -97,11 +99,19 @@
         });
 
         document.getElementById('add-custom').addEventListener('click', () => {
-            customShape();
+            embedmentShape();
         });
 
         document.getElementById('addBar-button').addEventListener('click', () => {
             doubleclickHandler();
+        });
+
+        document.getElementById('addSupport-button').addEventListener('click', () => {
+            supportShape();
+        });
+
+        document.getElementById('addForce-button').addEventListener('click', () => {
+            forceShape();
         });
 
         window.addEventListener('click', () => { 
@@ -146,7 +156,8 @@
         let isDrawing = false;
 
         stage.on("click", (e) => {
-            if (e.target.attrs.name === "bar" || e.target.attrs.name === "custom"){
+            if (e.target.attrs.name === "bar" || e.target.attrs.name === "embedment"
+                || e.target.attrs.name === "support" || e.target.attrs.name === "force"){
                 console.log("bar clicked.");
                 tr = new Konva.Transformer({
                     nodes: [e.target],
@@ -402,7 +413,7 @@
                 name: "bar",
                 x: stage.getPointerPosition().x - barThickness,
                 y: stage.getPointerPosition().y - barThickness,
-                width: barShape,
+                width: 100,
                 height: barShape,
                 fill: "lightblue",
                 stroke: "black",
@@ -415,7 +426,7 @@
             layer.add(bar).batchDraw();
         }
 
-        function customShape(){
+        function embedmentShape(){
             const embedmentShape = 20;
             const embedmentThickness = barShape/2;
             var embedment = new Konva.Rect({
@@ -423,7 +434,7 @@
                 x: stage.getPointerPosition().x - embedmentThickness,
                 y: stage.getPointerPosition().y - embedmentThickness,
                 width: 5,
-                height: 20,
+                height: 50,
                 fill: "grey",
                 stroke: "black",
                 strokeWidth: 2,
@@ -434,6 +445,46 @@
         
               // add the triangle shape to the layer
               layer.add(embedment).batchDraw();
+        }
+
+        function supportShape(){
+            const embedmentShape = 15;
+            const embedmentThickness = barShape/2;
+            var support = new Konva.RegularPolygon({
+                name: "support",
+                x: stage.getPointerPosition().x - embedmentThickness,
+                y: stage.getPointerPosition().y - embedmentThickness,
+                sides: 3,
+                radius: 15,
+                fill: '#d5d4d3',
+                stroke: 'black',
+                strokeWidth: 2,
+                draggable: true,
+                strokeScaleEnabled: false,
+              });
+
+              layer.add(support).batchDraw();
+        }
+
+        function forceShape(){
+            var width = 50;
+            var height = 50;
+            var force = new Konva.Arrow({
+                name: "force",
+                x: stage.width() / 4,
+                y: stage.height() / 4,
+                points: [0, 0, width / 2, height / 2],
+                pointerLength: 10,
+                pointerWidth: 10,
+                fill: '#13861f',
+                stroke: '#13861f',
+                strokeWidth: 10,
+                draggable: true,
+                strokeScaleEnabled: false,
+              });
+        
+              // add the shape to the layer
+              layer.add(force).batchDraw();
         }
 
         function mouseupHandler(){

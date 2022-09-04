@@ -95,8 +95,8 @@
             }));
             }
             // var layer = new Konva.Layer();
-            newRectangle(blockSnapSize * 3, blockSnapSize * 3, layer, stage);
-            newRectangle(blockSnapSize * 10, blockSnapSize * 3, layer, stage);
+            // newRectangle(blockSnapSize * 3, blockSnapSize * 3, layer, stage);
+            // newRectangle(blockSnapSize * 10, blockSnapSize * 3, layer, stage);
 
             stage.add(gridLayer);
             // stage.add(layer);
@@ -201,77 +201,18 @@
             }
         });
 
-        var shadowRectangle = new Konva.Rect({
-        x: 0,
-        y: 0,
-        width: blockSnapSize * 6,
-        height: blockSnapSize * 3,
-        fill: '#FF7B17',
-        opacity: 0.6,
-        stroke: '#CF6412',
-        strokeWidth: 3,
-        dash: [20, 2]
-        });
-        
-        layer.add(shadowRectangle);
-        shadowRectangle.hide();
-
-        function newRectangle(x, y, layer, stage) {
-        let rectangle = new Konva.Rect({
-            name: "bar",
-            x: x,
-            y: y,
-            width: blockSnapSize * 6,
-            height: blockSnapSize * 3,
-            fill: '#fff',
-            stroke: '#ddd',
-            strokeWidth: 1,
-            shadowColor: 'black',
-            shadowBlur: 2,
-            shadowOffset: {x : 1, y : 1},
-            shadowOpacity: 0.4,
-            draggable: true
-        });
-        rectangle.on('dragstart', (e) => {
-            shadowRectangle.show();
-            shadowRectangle.moveToTop();
-            rectangle.moveToTop();
-        });
-        rectangle.on('dragend', (e) => {
-            rectangle.position({
-            x: Math.round(rectangle.x() / blockSnapSize) * blockSnapSize,
-            y: Math.round(rectangle.y() / blockSnapSize) * blockSnapSize
-            });
-            stage.batchDraw();
-            shadowRectangle.hide();
-        });
-        rectangle.on('dragmove', (e) => {
-            shadowRectangle.position({
-            x: Math.round(rectangle.x() / blockSnapSize) * blockSnapSize,
-            y: Math.round(rectangle.y() / blockSnapSize) * blockSnapSize
-            });
-            stage.batchDraw();
-        });
-        layer.add(rectangle);
-        }
-
-        // var stage = new Konva.Stage({
-        // container: 'container',
-        // width: width,
-        // height: height
-        // });
-
 
         let clickPositionX = null;
         let clickPositionY = null;
+        let shadowFigure;
         function doubleclickHandler(){
             isDrawing = true;
             bar = new Konva.Rect({
                 name: "bar",
-                x: stage.getPointerPosition().x - barThickness,
-                y: stage.getPointerPosition().y - barThickness,
-                width: 100,
-                height: barShape,
+                x: stage.getPointerPosition().x,
+                y: stage.getPointerPosition().y,
+                width: blockSnapSize * 4,
+                height: blockSnapSize,
                 fill: "lightblue",
                 stroke: "black",
                 strokeWidth: 2,
@@ -279,8 +220,15 @@
                 draggable: true,
             });
             bar.on('dragstart', (e) => {
-                shadowRectangle.show();
-                shadowRectangle.moveToTop();
+                shadowFigure = bar.clone({
+                    fill: '#FF7B17',
+                    opacity: 0.6,
+                    stroke: '#CF6412',
+                    strokeWidth: 3,
+                    dash: [20, 2]
+                });
+                layer.add(shadowFigure);
+                shadowFigure.moveToTop();
                 bar.moveToTop();
             });
             bar.on('dragend', (e) => {
@@ -289,10 +237,10 @@
                 y: Math.round(bar.y() / blockSnapSize) * blockSnapSize
                 });
                 stage.batchDraw();
-                shadowRectangle.hide();
+                shadowFigure.destroy();
             });
             bar.on('dragmove', (e) => {
-                shadowRectangle.position({
+                shadowFigure.position({
                 x: Math.round(bar.x() / blockSnapSize) * blockSnapSize,
                 y: Math.round(bar.y() / blockSnapSize) * blockSnapSize
                 });

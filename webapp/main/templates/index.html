@@ -2,17 +2,23 @@
 {% block content %}
 
 <h1>DCL Drawer</h1>
+<div id="tool-menu">
+  <div>
+      <button id="rotateLeft-button">Rotate Left</button> <button id="rotateRight-button">Rotate Right</button>
+  </div>
+</div>
 <div id="konva-holder"> </div>
     <head>
         <script src="https://unpkg.com/konva@8.3.12/konva.min.js"></script>
         <meta charset="utf-8" />
         <style>
         body {
-            margin: 0;
-            padding: 0;
+            margin: 10;
+            padding: 10;
             overflow: hidden;
             background-color: #f0f0f0;
         }
+
 
         #menu {
             display: none;
@@ -54,8 +60,13 @@
         const barShape = 20;
         const barThickness = barShape/2;
         var GUIDELINE_OFFSET = 5;
-        
-        let transformers = [];
+        var angle = 0
+        let shapes = []
+        var rotateToRight = 10
+        var rotateToLeft = -10
+        let transformers = []
+        var position = {x: 80, y: 45}
+        let shape = null
 
         function drawLinesSolution1(layer){      
             const stepSize = 15;
@@ -114,6 +125,14 @@
             forceShape();
         });
 
+        document.getElementById('rotateRight-button').addEventListener('click', () => {
+            rotateRight();
+        });
+
+        document.getElementById('rotateLeft-button').addEventListener('click', () => {
+            rotateLeft();
+        });
+
         window.addEventListener('click', () => { 
                 menuNode.style.display = 'none'; 
             }
@@ -156,6 +175,7 @@
         let isDrawing = false;
 
         stage.on("click", (e) => {
+            shape = e.target
             if (e.target.attrs.name === "bar" || e.target.attrs.name === "embedment"
                 || e.target.attrs.name === "support" || e.target.attrs.name === "force"){
                 console.log("bar clicked.");
@@ -165,7 +185,7 @@
                     anchorStroke: 'red',
                     anchorFill: 'lightblue',
                     anchorSize: 5,
-                    ignoreStroke: true,
+                    enabledAnchors: ['top-left', 'top-right', 'bottom-left', 'bottom-right'],
                 });
                 layer.add(tr);
                 transformers.push(tr);
@@ -499,6 +519,44 @@
             layer.batchDraw();    
         }
 
+        function rotateAroundPoint(shape, angleDegrees, point) {
+            let angleRadians = angleDegrees * Math.PI / 180; // sin + cos require radians
+            
+            const x =
+              point.x +
+              (shape.x() - point.x) * Math.cos(angleRadians) -
+              (shape.y() - point.y) * Math.sin(angleRadians);
+            const y =
+              point.y +
+              (shape.x() - point.x) * Math.sin(angleRadians) +
+              (shape.y() - point.y) * Math.cos(angleRadians);
+             
+            shape.position({x: x, y: y});  // move the rotated shape in relation to the rotation point.
+            shape.rotation(shape.rotation() + angleDegrees); // rotate the shape in place around its natural rotation point
+            
+        }
+
+        function rotateRight(){
+            // This is the important call ! Cross is the rotation point as illustrated by crosshairs.
+            rotateAroundPoint(shape, rotateToRight, {x: shape.x(), y: shape.y()});
+            
+            shape.moveToTop(); // ensure the 'tails' shapes do not cover the main shape
+            
+            stage.draw();
+            
+            angle = angle + 10;
+        }
+
+        function rotateLeft(){
+            // This is the important call ! Cross is the rotation point as illustrated by crosshairs.
+            rotateAroundPoint(shape, rotateToLeft, {x: shape.x(), y: shape.y()});
+            
+            shape.moveToTop(); // ensure the 'tails' shapes do not cover the main shape
+            
+            stage.draw();
+            
+            angle = angle + 10;
+        }
     </script>
   </body>
 {% endblock %}

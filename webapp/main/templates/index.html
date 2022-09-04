@@ -41,8 +41,10 @@
     <div id="container"></div>
     <div id="menu">
       <div>
-        <button id="pulse-button">Insert Bar</button
-        ><button id="delete-button">Delete Bar</button>
+        <button id="addBar-button">Insert Bar</button>
+        <button id="delete-button">Delete Bar</button>
+        <button id="add-custom">Custom Object</button>
+        <button id="add-force">Add Force</button>
       </div>
     </div>
     <script>
@@ -93,6 +95,14 @@
             currentShape.destroy();
         });
 
+        document.getElementById('add-custom').addEventListener('click', () => {
+            customShape();
+        });
+
+        document.getElementById('addBar-button').addEventListener('click', () => {
+            doubleclickHandler();
+        });
+
         window.addEventListener('click', () => { 
                 menuNode.style.display = 'none'; 
             }
@@ -100,9 +110,7 @@
 
         function ctxtmenu(e){
             e.evt.preventDefault();
-            if (e.target === stage) {
-                return;
-            }
+
             currentShape = e.target; // if there is one 
 
             var containerRect = stage.container().getBoundingClientRect();
@@ -135,9 +143,8 @@
         let bar = null;
         let isDrawing = false;
 
-        stage.on("dblclick", doubleclickHandler);
         stage.on("click", (e) => {
-            if (e.target.attrs.name === "bar"){
+            if (e.target.attrs.name === "bar" || e.target.attrs.name === "custom"){
                 console.log("bar clicked.");
                 tr = new Konva.Transformer({
                     nodes: [e.target],
@@ -180,7 +187,27 @@
             layer.add(bar).batchDraw();
         }
 
-        doubleclickHandler();
+        function customShape(){
+            const embedmentShape = 20;
+            const embedmentThickness = barShape/2;
+            var embedment = new Konva.Rect({
+                name: "embedment",
+                x: stage.getPointerPosition().x - embedmentThickness,
+                y: stage.getPointerPosition().y - embedmentThickness,
+                width: 5,
+                height: 20,
+                fill: "grey",
+                stroke: "black",
+                strokeWidth: 2,
+                draggable: true,
+                strokeScaleEnabled: false,
+                
+              });
+        
+              // add the triangle shape to the layer
+              layer.add(embedment).batchDraw();
+        }
+
         function mouseupHandler(){
             isDrawing = false;
         }

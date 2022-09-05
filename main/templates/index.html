@@ -112,6 +112,9 @@
             if (shape.name() === "stage"){
                 return;
             }
+            else if (shape.name() === "circle1" || shape.name() === "circle2"){
+                currentShape.parent.destroy();
+            }
             currentShape.destroy();
         });
 
@@ -497,9 +500,6 @@
             group.add(circle1);
             group.add(circle2);
             group.moveToTop();
-            group.cache({
-                drawBorder: true,
-            })
             layer.batchDraw();
         }
 

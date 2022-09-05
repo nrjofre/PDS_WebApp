@@ -206,16 +206,51 @@
 
         stage.on("click", (e) => {
             shape = e.target
-            if (e.target.attrs.name === "bar" || e.target.attrs.name === "embedment"
-                || e.target.attrs.name === "support" || e.target.attrs.name === "force" || e.target.attrs.name === "line" 
-                || e.target.attrs.name === "slidingSupport" || e.target.attrs.name === "connectingRod"){
+            if (e.target.attrs.name === "bar" || e.target.attrs.name === "support" || e.target.attrs.name === "force" 
+            || e.target.attrs.name === "line" || e.target.attrs.name === "slidingSupport" || e.target.attrs.name === "connectingRod"){
                 tr = new Konva.Transformer({
                     nodes: [e.target],
-                    name: "Transformer",
+                    name: e.target.attrs.name,
                     anchorStroke: 'red',
                     anchorFill: 'lightblue',
                     anchorSize: 10,
                     enabledAnchors: ['middle-left', 'middle-right'],
+                });
+                layer.add(tr);
+                transformers.push(tr);
+            }
+            else if (e.target.attrs.name === "embedment"){
+                tr = new Konva.Transformer({
+                    nodes: [e.target],
+                    name: e.target.attrs.name,
+                    anchorStroke: 'red',
+                    anchorFill: 'lightblue',
+                    anchorSize: 10,
+                    enabledAnchors: ['top-center', 'bottom-center'],
+                });
+                layer.add(tr);
+                transformers.push(tr);
+            }
+            else if (e.target.attrs.name === "text"){
+                tr = new Konva.Transformer({
+                    nodes: [e.target],
+                    name: e.target.attrs.name,
+                    anchorStroke: 'red',
+                    anchorFill: 'lightblue',
+                    anchorSize: 10,
+                    enabledAnchors: ['middle-left', 'middle-right'],
+                    boundBoxFunc: function (oldBox, newBox) {
+                        newBox.width = Math.max(30, newBox.width);
+                        return newBox;
+                    },
+                });
+
+                textNode.on('transform', function () {
+                    // reset scale, so only with is changing by transformer
+                    textNode.setAttrs({
+                        width: textNode.width() * textNode.scaleX(),
+                        scaleX: 1,
+                    });
                 });
                 layer.add(tr);
                 transformers.push(tr);
@@ -320,23 +355,28 @@
         function slidingSupportShape(){
             const embedmentShape = 15;
             const embedmentThickness = barShape/2;
-            var slidingSupport = new Konva.Shape({
-                sceneFunc: function (context, shape) {
-                context.beginPath();
-                context.moveTo(stage.getPointerPosition().x - embedmentThickness, stage.getPointerPosition().y - embedmentThickness);
-                context.lineTo(stage.getPointerPosition().x - embedmentThickness + 30, stage.getPointerPosition().y - embedmentThickness);
-                context.lineTo(stage.getPointerPosition().x - embedmentThickness + 15, stage.getPointerPosition().y - embedmentThickness - 15);
-                context.closePath();
+            //var slidingSupport = new Konva.Shape({
+                //sceneFunc: function (context, shape) {
+                //context.beginPath();
+                //context.moveTo(stage.getPointerPosition().x - embedmentThickness, stage.getPointerPosition().y - embedmentThickness);
+                //context.lineTo(stage.getPointerPosition().x - embedmentThickness + 30, stage.getPointerPosition().y - embedmentThickness);
+                //context.lineTo(stage.getPointerPosition().x - embedmentThickness + 15, stage.getPointerPosition().y - embedmentThickness - 15);
+                //context.closePath();
 
-                context.beginPath();
-                context.moveTo(stage.getPointerPosition().x - embedmentThickness + 15, stage.getPointerPosition().y - embedmentThickness);
-                context.closePath();
+                //context.beginPath();
+                //context.moveTo(stage.getPointerPosition().x - embedmentThickness + 15, stage.getPointerPosition().y - embedmentThickness);
+                //context.closePath();
 
           // (!) Konva specific method, it is very important
-                context.fillStrokeShape(shape);
-                },
+                //context.fillStrokeShape(shape);
+                //},
+            var slidingSupport = new Konva.RegularPolygon({
                 name: "slidingSupport",
-                fill: '#d5d4d3',
+                x: stage.getPointerPosition().x - embedmentThickness,
+                y: stage.getPointerPosition().y - embedmentThickness,
+                sides: 3,
+                radius: 15,
+                fill: '#dfaf1a',
                 stroke: 'black',
                 strokeWidth: 2,
                 draggable: true,
@@ -347,7 +387,7 @@
         }
 
         function ballJointShape(){
-            const embedmentShape = 15;
+            const embedmentShape = 10;
             const embedmentThickness = barShape/2;
             var ballJoint = new Konva.Circle({
                 name: "ballJoint",
@@ -365,36 +405,36 @@
         }
 
         function lineShape(){
-            const embedmentShape = 15;
-            const embedmentThickness = barShape/2;
-            var line = new Konva.Line({
+            var line = new Konva.Rect({
                 name: "line",
-                x: stage.getPointerPosition().x - embedmentThickness,
-                y: stage.getPointerPosition().y - embedmentThickness,
-                points: [stage.getPointerPosition().x - embedmentThickness, stage.getPointerPosition().y - embedmentThickness, stage.getPointerPosition().x - embedmentThickness + 40, stage.getPointerPosition().y - embedmentThickness],
-                fill: '#d5d4d3',
-                stroke: 'black',
-                strokeWidth: 2,
+                x: stage.getPointerPosition().x,
+                y: stage.getPointerPosition().y,
+                width: 70,
+                height: 1,
+                fill: "grey",
+                stroke: "black",
+                strokeWidth: 1,
                 draggable: true,
                 strokeScaleEnabled: false,
+                
               });
-
+        
+              // add the triangle shape to the layer
               layer.add(line).batchDraw();
         }
 
         function textShape(){
-            const embedmentShape = 15;
-            const embedmentThickness = barShape/2;
             var text = new Konva.Text({
                 name: "text",
-                x: stage.getPointerPosition().x - embedmentThickness,
-                y: stage.getPointerPosition().y - embedmentThickness,
+                text: 'enter text',
+                x: stage.getPointerPosition().x,
+                y: stage.getPointerPosition().y,
                 fontSize: 20,
                 draggable: true,
-                strokeScaleEnabled: false,
-              });
+                width: 200,
+            });
 
-              layer.add(text).batchDraw();
+            layer.add(text).batchDraw();
         }
 
         function connectingRodShape(){
@@ -422,8 +462,9 @@
             var height = 50;
             var force = new Konva.Arrow({
                 name: "force",
-                x: stage.width() / 4,
-                y: stage.height() / 4,
+                rotation: 45,
+                x: stage.getPointerPosition().x,
+                y: stage.getPointerPosition().y,
                 points: [0, 0, width / 2, height / 2],
                 pointerLength: 10,
                 pointerWidth: 10,

@@ -16,3 +16,8 @@ Credenciales Usuario por defecto: (pueden modificarlo en el seed.py si quieren o
 
 - Username : user1
 - Password : clavejeje
+
+
+Site URL:
+
+- https://its-estatica.herokuapp.com

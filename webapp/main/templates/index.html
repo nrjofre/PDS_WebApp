@@ -403,52 +403,6 @@
                 strokeScaleEnabled: false,
               });
             
-<<<<<<< HEAD
-
-            var textNode = new Konva.Text({
-                name: "forceText",
-                text: 'Write the force applied',
-                x: stage.getPointerPosition().x - 40,
-                y: stage.getPointerPosition().y - 20,
-                fontSize: 20,
-                draggable: true,
-            });
-
-            textNode.on('dblclick dbltap', () => {
-                var textPosition = textNode.getAbsolutePosition();
-        
-                var stageBox = stage.container().getBoundingClientRect();
-        
-                var areaPosition = {
-                    x: stageBox.left + textPosition.x,
-                    y: stageBox.top + textPosition.y,
-                };
-        
-                var textarea = document.createElement('textarea');
-                document.body.appendChild(textarea);
-        
-                textarea.value = textNode.text();
-                textarea.style.position = 'absolute';
-                textarea.style.top = areaPosition.y + 'px';
-                textarea.style.left = areaPosition.x + 'px';
-                textarea.style.width = textNode.width();
-        
-                textarea.focus();
-        
-                textarea.addEventListener('keydown', function (e) {
-                    if (e.keyCode === 13) {
-                    textNode.text(textarea.value);
-                    document.body.removeChild(textarea);
-                    }
-                });
-            });
-
-            group.add(line);
-            group.add(textNode);
-            layer.add(group).batchDraw();
-        }
-=======
->>>>>>> 9b95c8c344834ead91dd65278994a02c036edd4b
 
             var textNode = new Konva.Text({
                 name: "forceText",
@@ -494,13 +448,6 @@
         }
 
         function connectingRodShape(){
-            var group = new Konva.Group({
-                name: "group",
-                x: stage.getPointerPosition().x,
-                y: stage.getPointerPosition().y,
-                draggable: true,
-            });
-
             var line1 = new Konva.Rect({
                 name: "line1",
                 x: 22,
@@ -511,10 +458,7 @@
                 stroke: "black",
                 strokeWidth: 1,
                 strokeScaleEnabled: false,
-<<<<<<< HEAD
-=======
                 draggable: false,
->>>>>>> 9b95c8c344834ead91dd65278994a02c036edd4b
               });
 
             var circle1 = new Konva.Circle({
@@ -539,13 +483,6 @@
                 draggable: false,
               });
             
-<<<<<<< HEAD
-
-            group.add(line1);
-            group.add(circle1);
-            group.add(circle2);
-            layer.add(group).batchDraw();
-=======
             var group = new Konva.Group({
                 name: "group",
                 x: stage.getPointerPosition().x,
@@ -564,7 +501,6 @@
                 drawBorder: true,
             })
             layer.batchDraw();
->>>>>>> 9b95c8c344834ead91dd65278994a02c036edd4b
         }
 
 
@@ -577,10 +513,6 @@
                 draggable: true,
             });
 
-<<<<<<< HEAD
-
-=======
->>>>>>> 9b95c8c344834ead91dd65278994a02c036edd4b
             var force = new Konva.Arrow({
                 name: "force",
                 rotation: 45,
@@ -608,21 +540,12 @@
                 var textPosition = textNode.getAbsolutePosition();
         
                 var stageBox = stage.container().getBoundingClientRect();
-<<<<<<< HEAD
         
                 var areaPosition = {
                     x: stageBox.left + textPosition.x,
                     y: stageBox.top + textPosition.y,
                 };
         
-=======
-        
-                var areaPosition = {
-                    x: stageBox.left + textPosition.x,
-                    y: stageBox.top + textPosition.y,
-                };
-        
->>>>>>> 9b95c8c344834ead91dd65278994a02c036edd4b
                 var textarea = document.createElement('textarea');
                 document.body.appendChild(textarea);
         

@@ -416,22 +416,63 @@
         }
 
         function lineShape(){
+            var group = new Konva.Group({
+                draggable: true,
+            });
+
             var line = new Konva.Rect({
                 name: "line",
                 x: stage.getPointerPosition().x,
                 y: stage.getPointerPosition().y,
                 width: 70,
-                height: 1,
+                height: 2,
                 fill: "grey",
                 stroke: "black",
-                strokeWidth: 1,
-                draggable: true,
                 strokeScaleEnabled: false,
-                
               });
+            
+
+            var textNode = new Konva.Text({
+                name: "forceText",
+                text: 'Write the force applied',
+                x: stage.getPointerPosition().x - 40,
+                y: stage.getPointerPosition().y - 20,
+                fontSize: 20,
+                draggable: true,
+            });
+
+            textNode.on('dblclick dbltap', () => {
+                var textPosition = textNode.getAbsolutePosition();
         
-              // add the triangle shape to the layer
-              layer.add(line).batchDraw();
+                var stageBox = stage.container().getBoundingClientRect();
+        
+                var areaPosition = {
+                    x: stageBox.left + textPosition.x,
+                    y: stageBox.top + textPosition.y,
+                };
+        
+                var textarea = document.createElement('textarea');
+                document.body.appendChild(textarea);
+        
+                textarea.value = textNode.text();
+                textarea.style.position = 'absolute';
+                textarea.style.top = areaPosition.y + 'px';
+                textarea.style.left = areaPosition.x + 'px';
+                textarea.style.width = textNode.width();
+        
+                textarea.focus();
+        
+                textarea.addEventListener('keydown', function (e) {
+                    if (e.keyCode === 13) {
+                    textNode.text(textarea.value);
+                    document.body.removeChild(textarea);
+                    }
+                });
+            });
+
+            group.add(line);
+            group.add(textNode);
+            layer.add(group).batchDraw();
         }
 
         function textShape(){
@@ -449,6 +490,13 @@
         }
 
         function connectingRodShape(){
+            var group = new Konva.Group({
+                name: "group",
+                x: stage.getPointerPosition().x,
+                y: stage.getPointerPosition().y,
+                draggable: true,
+            });
+
             var line1 = new Konva.Rect({
                 name: "line",
                 x: 22,
@@ -458,7 +506,7 @@
                 fill: "grey",
                 stroke: "black",
                 strokeWidth: 1,
-                strokeScaleEnabled: false, 
+                strokeScaleEnabled: false,
               });
 
             var circle1 = new Konva.Circle({
@@ -481,24 +529,24 @@
                 strokeScaleEnabled: false,
               });
             
-              var group = new Konva.Group({
-                name: "group",
-                x: stage.getPointerPosition().x,
-                y: stage.getPointerPosition().y,
-                draggable: true,
-              });
 
-              layer.add(group);
-              group.add(line1);
-              group.add(circle1);
-              group.add(circle2);
-              layer.batchDraw();
+            group.add(line1);
+            group.add(circle1);
+            group.add(circle2);
+            layer.add(group).batchDraw();
         }
 
 
         function forceShape(){
             var width = 50;
             var height = 50;
+
+            var group = new Konva.Group({
+                name: "forceGroup",
+                draggable: true,
+            });
+
+
             var force = new Konva.Arrow({
                 name: "force",
                 rotation: 45,
@@ -510,12 +558,50 @@
                 fill: '#13861f',
                 stroke: '#13861f',
                 strokeWidth: 10,
-                draggable: true,
                 strokeScaleEnabled: false,
               });
+              
+            var textNode = new Konva.Text({
+                name: "forceText",
+                text: 'Write the force applied',
+                x: stage.getPointerPosition().x - 40,
+                y: stage.getPointerPosition().y - 20,
+                fontSize: 20,
+                draggable: true,
+            });
+
+            textNode.on('dblclick dbltap', () => {
+                var textPosition = textNode.getAbsolutePosition();
         
-              // add the shape to the layer
-              layer.add(force).batchDraw();
+                var stageBox = stage.container().getBoundingClientRect();
+        
+                var areaPosition = {
+                    x: stageBox.left + textPosition.x,
+                    y: stageBox.top + textPosition.y,
+                };
+        
+                var textarea = document.createElement('textarea');
+                document.body.appendChild(textarea);
+        
+                textarea.value = textNode.text();
+                textarea.style.position = 'absolute';
+                textarea.style.top = areaPosition.y + 'px';
+                textarea.style.left = areaPosition.x + 'px';
+                textarea.style.width = textNode.width();
+        
+                textarea.focus();
+        
+                textarea.addEventListener('keydown', function (e) {
+                    if (e.keyCode === 13) {
+                    textNode.text(textarea.value);
+                    document.body.removeChild(textarea);
+                    }
+                });
+            });
+
+            group.add(force);
+            group.add(textNode);
+            layer.add(group).batchDraw();
         }
 
 

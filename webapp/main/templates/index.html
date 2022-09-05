@@ -53,7 +53,6 @@
         <button id="addBallJoint-button">Add Ball Joint</button>
         <button id="addConnectingRod-button">Add Connecting Rod</button>
         <button id="addEmbedment-button">Add Embedment</button>
-        <button id="addText-button">Add Text</button>
         <button id="addLine-button">Add Line</button>
         <button id="addForce-button">Add Force</button>
         <button id="delete-button">Delete Object</button>
@@ -136,10 +135,6 @@
             ballJointShape();
         });
 
-        document.getElementById('addText-button').addEventListener('click', () => {
-            textShape();
-        });
-
         document.getElementById('addLine-button').addEventListener('click', () => {
             lineShape();
         });
@@ -206,7 +201,7 @@
 
         stage.on("click", (e) => {
             shape = e.target
-            console.log(e.target.attrs.name);
+            console.log(e.target.parent);
             if (e.target.attrs.name === "bar" || e.target.attrs.name === "support" || e.target.attrs.name === "force" 
             || e.target.attrs.name === "line" || e.target.attrs.name === "slidingSupport"){
                 tr = new Konva.Transformer({
@@ -234,35 +229,12 @@
             }
             else if (e.target.attrs.name === "circle1" || e.target.attrs.name === "circle2"){
                 tr = new Konva.Transformer({
-                    nodes: [e.target],
-                    name: e.target.attrs.name,
+                    nodes: [e.target.parent],
+                    name: "group",
                     anchorStroke: 'red',
                     anchorFill: 'lightblue',
                     anchorSize: 10,
-                });
-                layer.add(tr);
-                transformers.push(tr);
-            }
-            else if (e.target.attrs.name === "text"){
-                tr = new Konva.Transformer({
-                    nodes: [e.target],
-                    name: e.target.attrs.name,
-                    anchorStroke: 'red',
-                    anchorFill: 'lightblue',
-                    anchorSize: 10,
-                    enabledAnchors: ['middle-left', 'middle-right'],
-                    boundBoxFunc: function (oldBox, newBox) {
-                        newBox.width = Math.max(30, newBox.width);
-                        return newBox;
-                    },
-                });
-
-                textNode.on('transform', function () {
-                    // reset scale, so only with is changing by transformer
-                    textNode.setAttrs({
-                        width: textNode.width() * textNode.scaleX(),
-                        scaleX: 1,
-                    });
+                    enabledAnchors: [],
                 });
                 layer.add(tr);
                 transformers.push(tr);
@@ -431,6 +403,52 @@
                 strokeScaleEnabled: false,
               });
             
+<<<<<<< HEAD
+
+            var textNode = new Konva.Text({
+                name: "forceText",
+                text: 'Write the force applied',
+                x: stage.getPointerPosition().x - 40,
+                y: stage.getPointerPosition().y - 20,
+                fontSize: 20,
+                draggable: true,
+            });
+
+            textNode.on('dblclick dbltap', () => {
+                var textPosition = textNode.getAbsolutePosition();
+        
+                var stageBox = stage.container().getBoundingClientRect();
+        
+                var areaPosition = {
+                    x: stageBox.left + textPosition.x,
+                    y: stageBox.top + textPosition.y,
+                };
+        
+                var textarea = document.createElement('textarea');
+                document.body.appendChild(textarea);
+        
+                textarea.value = textNode.text();
+                textarea.style.position = 'absolute';
+                textarea.style.top = areaPosition.y + 'px';
+                textarea.style.left = areaPosition.x + 'px';
+                textarea.style.width = textNode.width();
+        
+                textarea.focus();
+        
+                textarea.addEventListener('keydown', function (e) {
+                    if (e.keyCode === 13) {
+                    textNode.text(textarea.value);
+                    document.body.removeChild(textarea);
+                    }
+                });
+            });
+
+            group.add(line);
+            group.add(textNode);
+            layer.add(group).batchDraw();
+        }
+=======
+>>>>>>> 9b95c8c344834ead91dd65278994a02c036edd4b
 
             var textNode = new Konva.Text({
                 name: "forceText",
@@ -475,20 +493,6 @@
             layer.add(group).batchDraw();
         }
 
-        function textShape(){
-            var text = new Konva.Text({
-                name: "text",
-                text: 'enter text',
-                x: stage.getPointerPosition().x,
-                y: stage.getPointerPosition().y,
-                fontSize: 20,
-                draggable: true,
-                width: 200,
-            });
-
-            layer.add(text).batchDraw();
-        }
-
         function connectingRodShape(){
             var group = new Konva.Group({
                 name: "group",
@@ -498,7 +502,7 @@
             });
 
             var line1 = new Konva.Rect({
-                name: "line",
+                name: "line1",
                 x: 22,
                 y: 20,
                 width: 45,
@@ -507,6 +511,10 @@
                 stroke: "black",
                 strokeWidth: 1,
                 strokeScaleEnabled: false,
+<<<<<<< HEAD
+=======
+                draggable: false,
+>>>>>>> 9b95c8c344834ead91dd65278994a02c036edd4b
               });
 
             var circle1 = new Konva.Circle({
@@ -517,6 +525,7 @@
                 stroke: 'black',
                 strokeWidth: 2,
                 strokeScaleEnabled: false,
+                draggable: false,
               });
 
             var circle2 = new Konva.Circle({
@@ -527,13 +536,35 @@
                 stroke: 'black',
                 strokeWidth: 2,
                 strokeScaleEnabled: false,
+                draggable: false,
               });
             
+<<<<<<< HEAD
 
             group.add(line1);
             group.add(circle1);
             group.add(circle2);
             layer.add(group).batchDraw();
+=======
+            var group = new Konva.Group({
+                name: "group",
+                x: stage.getPointerPosition().x,
+                y: stage.getPointerPosition().y,
+                draggable: true,
+                listening: true,
+                rotation: 90,
+            });
+
+            layer.add(group);
+            group.add(line1);
+            group.add(circle1);
+            group.add(circle2);
+            group.moveToTop();
+            group.cache({
+                drawBorder: true,
+            })
+            layer.batchDraw();
+>>>>>>> 9b95c8c344834ead91dd65278994a02c036edd4b
         }
 
 
@@ -546,7 +577,10 @@
                 draggable: true,
             });
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 9b95c8c344834ead91dd65278994a02c036edd4b
             var force = new Konva.Arrow({
                 name: "force",
                 rotation: 45,
@@ -574,12 +608,21 @@
                 var textPosition = textNode.getAbsolutePosition();
         
                 var stageBox = stage.container().getBoundingClientRect();
+<<<<<<< HEAD
         
                 var areaPosition = {
                     x: stageBox.left + textPosition.x,
                     y: stageBox.top + textPosition.y,
                 };
         
+=======
+        
+                var areaPosition = {
+                    x: stageBox.left + textPosition.x,
+                    y: stageBox.top + textPosition.y,
+                };
+        
+>>>>>>> 9b95c8c344834ead91dd65278994a02c036edd4b
                 var textarea = document.createElement('textarea');
                 document.body.appendChild(textarea);
         

@@ -49,7 +49,12 @@
       <div>
         <button id="addBar-button">Insert Bar</button>
         <button id="addSupport-button">Add Support</button>
-        <button id="add-custom">Add Embedment</button>
+        <button id="addSlidingSupport-button">Add Sliding Support</button>
+        <button id="addBallJoint-button">Add Ball Joint</button>
+        <button id="addConnectingRod-button">Add Connecting Rod</button>
+        <button id="addEmbedment-button">Add Embedment</button>
+        <button id="addText-button">Add Text</button>
+        <button id="addLine-button">Add Line</button>
         <button id="addForce-button">Add Force</button>
         <button id="delete-button">Delete Object</button>
       </div>
@@ -111,7 +116,7 @@
             currentShape.destroy();
         });
 
-        document.getElementById('add-custom').addEventListener('click', () => {
+        document.getElementById('addEmbedment-button').addEventListener('click', () => {
             embedmentShape();
         });
 
@@ -121,6 +126,26 @@
 
         document.getElementById('addSupport-button').addEventListener('click', () => {
             supportShape();
+        });
+
+        document.getElementById('addSlidingSupport-button').addEventListener('click', () => {
+            slidingSupportShape();
+        });
+
+        document.getElementById('addBallJoint-button').addEventListener('click', () => {
+            ballJointShape();
+        });
+
+        document.getElementById('addText-button').addEventListener('click', () => {
+            textShape();
+        });
+
+        document.getElementById('addLine-button').addEventListener('click', () => {
+            lineShape();
+        });
+
+        document.getElementById('addConnectingRod-button').addEventListener('click', () => {
+            connectingRodShape();
         });
 
         document.getElementById('addForce-button').addEventListener('click', () => {
@@ -182,7 +207,8 @@
         stage.on("click", (e) => {
             shape = e.target
             if (e.target.attrs.name === "bar" || e.target.attrs.name === "embedment"
-                || e.target.attrs.name === "support" || e.target.attrs.name === "force"){
+                || e.target.attrs.name === "support" || e.target.attrs.name === "force" || e.target.attrs.name === "line" 
+                || e.target.attrs.name === "slidingSupport" || e.target.attrs.name === "connectingRod"){
                 tr = new Konva.Transformer({
                     nodes: [e.target],
                     name: "Transformer",
@@ -290,6 +316,106 @@
 
               layer.add(support).batchDraw();
         }
+        //in progress
+        function slidingSupportShape(){
+            const embedmentShape = 15;
+            const embedmentThickness = barShape/2;
+            var slidingSupport = new Konva.Shape({
+                sceneFunc: function (context, shape) {
+                context.beginPath();
+                context.moveTo(stage.getPointerPosition().x - embedmentThickness, stage.getPointerPosition().y - embedmentThickness);
+                context.lineTo(stage.getPointerPosition().x - embedmentThickness + 30, stage.getPointerPosition().y - embedmentThickness);
+                context.lineTo(stage.getPointerPosition().x - embedmentThickness + 15, stage.getPointerPosition().y - embedmentThickness - 15);
+                context.closePath();
+
+                context.beginPath();
+                context.moveTo(stage.getPointerPosition().x - embedmentThickness + 15, stage.getPointerPosition().y - embedmentThickness);
+                context.closePath();
+
+          // (!) Konva specific method, it is very important
+                context.fillStrokeShape(shape);
+                },
+                name: "slidingSupport",
+                fill: '#d5d4d3',
+                stroke: 'black',
+                strokeWidth: 2,
+                draggable: true,
+                strokeScaleEnabled: false,
+              });
+
+              layer.add(slidingSupport).batchDraw();
+        }
+
+        function ballJointShape(){
+            const embedmentShape = 15;
+            const embedmentThickness = barShape/2;
+            var ballJoint = new Konva.Circle({
+                name: "ballJoint",
+                x: stage.getPointerPosition().x - embedmentThickness,
+                y: stage.getPointerPosition().y - embedmentThickness,
+                radius: 10,
+                fill: '#d5d4d3',
+                stroke: 'black',
+                strokeWidth: 2,
+                draggable: true,
+                strokeScaleEnabled: false,
+              });
+
+              layer.add(ballJoint).batchDraw();
+        }
+
+        function lineShape(){
+            const embedmentShape = 15;
+            const embedmentThickness = barShape/2;
+            var line = new Konva.Line({
+                name: "line",
+                x: stage.getPointerPosition().x - embedmentThickness,
+                y: stage.getPointerPosition().y - embedmentThickness,
+                points: [stage.getPointerPosition().x - embedmentThickness, stage.getPointerPosition().y - embedmentThickness, stage.getPointerPosition().x - embedmentThickness + 40, stage.getPointerPosition().y - embedmentThickness],
+                fill: '#d5d4d3',
+                stroke: 'black',
+                strokeWidth: 2,
+                draggable: true,
+                strokeScaleEnabled: false,
+              });
+
+              layer.add(line).batchDraw();
+        }
+
+        function textShape(){
+            const embedmentShape = 15;
+            const embedmentThickness = barShape/2;
+            var text = new Konva.Text({
+                name: "text",
+                x: stage.getPointerPosition().x - embedmentThickness,
+                y: stage.getPointerPosition().y - embedmentThickness,
+                fontSize: 20,
+                draggable: true,
+                strokeScaleEnabled: false,
+              });
+
+              layer.add(text).batchDraw();
+        }
+
+        function connectingRodShape(){
+            const embedmentShape = 15;
+            const embedmentThickness = barShape/2;
+            var connectingRod = new Konva.RegularPolygon({
+                name: "connectingRod",
+                x: stage.getPointerPosition().x - embedmentThickness,
+                y: stage.getPointerPosition().y - embedmentThickness,
+                sides: 3,
+                radius: 15,
+                fill: '#d5d4d3',
+                stroke: 'black',
+                strokeWidth: 2,
+                draggable: true,
+                strokeScaleEnabled: false,
+              });
+
+              layer.add(connectingRod).batchDraw();
+        }
+
 
         function forceShape(){
             var width = 50;

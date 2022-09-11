@@ -198,7 +198,6 @@
 
         stage_layer_grid();
 
-        console.log(layer);
         let bar = null;
         let isDrawing = false;
 
@@ -268,34 +267,14 @@
                 draggable: true,
             });
             bar.on('dragstart', (e) => {
-                shadowFigure = e.target.clone({
-                    fill: '#FF7B17',
-                    opacity: 0.6,
-                    stroke: '#CF6412',
-                    strokeWidth: 3,
-                    dash: [20, 2]
-                });
-                layer.add(shadowFigure);
-                shadowFigure.moveToTop();
-                e.target.moveToTop();
+                shadowStart(e);
             });
             bar.on('dragend', (e) => {
-                e.target.position({
-                x: Math.round(e.target.x() / blockSnapSize) * blockSnapSize,
-                y: Math.round(e.target.y() / blockSnapSize) * blockSnapSize
-                });
-                stage.batchDraw();
-                shadowFigure.destroy();
+                shadowEnd(e);
             });
             bar.on('dragmove', (e) => {
-                shadowFigure.position({
-                x: Math.round(e.target.x() / blockSnapSize) * blockSnapSize,
-                y: Math.round(e.target.y() / blockSnapSize) * blockSnapSize
-                });
-                stage.batchDraw();
+                shadowMove(e);
             });
-            
-            // bar.on("click", barClickHandler);
             layer.add(bar).batchDraw();
         }
 
@@ -314,7 +293,17 @@
                 draggable: true,
                 strokeScaleEnabled: false,
                 
-              });
+            });
+              
+            embedment.on('dragstart', (e) => {
+                shadowStart(e);
+            });
+            embedment.on('dragend', (e) => {
+                shadowEnd(e);
+            });
+            embedment.on('dragmove', (e) => {
+                shadowMove(e);
+            });
         
               // add the triangle shape to the layer
               layer.add(embedment).batchDraw();
@@ -334,7 +323,16 @@
                 strokeWidth: 2,
                 draggable: true,
                 strokeScaleEnabled: false,
-              });
+            });
+            support.on('dragstart', (e) => {
+                shadowStart(e);
+            });
+            support.on('dragend', (e) => {
+                shadowEnd(e);
+            });
+            support.on('dragmove', (e) => {
+                shadowMove(e);
+            });
 
               layer.add(support).batchDraw();
         }
@@ -368,6 +366,15 @@
                 draggable: true,
                 strokeScaleEnabled: false,
               });
+            slidingSupport.on('dragstart', (e) => {
+                shadowStart(e);
+            });
+            slidingSupport.on('dragend', (e) => {
+                shadowEnd(e);
+            });
+            slidingSupport.on('dragmove', (e) => {
+                shadowMove(e);
+            });
 
               layer.add(slidingSupport).batchDraw();
         }
@@ -385,9 +392,18 @@
                 strokeWidth: 2,
                 draggable: true,
                 strokeScaleEnabled: false,
-              });
+            });
+            ballJoint.on('dragstart', (e) => {
+                shadowStart(e);
+            });
+            ballJoint.on('dragend', (e) => {
+                shadowEnd(e);
+            });
+            ballJoint.on('dragmove', (e) => {
+                shadowMove(e);
+            });
 
-              layer.add(ballJoint).batchDraw();
+            layer.add(ballJoint).batchDraw();
         }
 
         function lineShape(){

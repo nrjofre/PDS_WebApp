@@ -76,6 +76,36 @@
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
                 integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
                 crossorigin="anonymous"></script>
+        <script>
+            function shadowStart(e){
+                shadowFigure = e.target.clone({
+                    fill: '#FF7B17',
+                    opacity: 0.6,
+                    stroke: '#CF6412',
+                    strokeWidth: 3,
+                    dash: [20, 2]
+                });
+                layer.add(shadowFigure);
+                shadowFigure.moveToTop();
+                e.target.moveToTop();
+            };
+            function shadowEnd(e){
+                e.target.position({
+                x: Math.round(e.target.x() / blockSnapSize) * blockSnapSize,
+                y: Math.round(e.target.y() / blockSnapSize) * blockSnapSize
+                });
+                stage.batchDraw();
+                shadowFigure.destroy();
+            }
+            function shadowMove(e){
+                shadowFigure.position({
+                x: Math.round(e.target.x() / blockSnapSize) * blockSnapSize,
+                y: Math.round(e.target.y() / blockSnapSize) * blockSnapSize
+                });
+                stage.batchDraw();
+            }
+
+        </script>
     </body>
 </html>
 

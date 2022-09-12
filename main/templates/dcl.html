@@ -8,8 +8,9 @@
       <button id="rotateLeft-button">Rotate Left</button> <button id="rotateRight-button">Rotate Right</button>
       <form action="" method="POST">
         {% csrf_token %}
-        
-        <input type="submit" name="Submit">
+        {{ task.name }}
+        <input id="stageInput" type="hidden" name="stage" value="Debug">
+        <input onclick="getStageToList()" type="submit" name="Submit">
       </form>
   </div>
 </div>
@@ -645,7 +646,7 @@
         // also stage will be in focus on its click
         // container.focus();
 
-      const DELTA = 4;
+        const DELTA = 4;
         container.addEventListener('keydown', (e) => {
             console.log(e.key);
             if (e.key === "Backspace" || e.key === 'Delete'){
@@ -658,6 +659,11 @@
                 shapes = []
             }
         });
+        function getStageToList(){
+            json = stage.toJSON().substr(6372)
+            json = json.substr(0, json.length-3)
+            document.getElementById("stageInput").value = json
+        }
     </script>
   </body>
 

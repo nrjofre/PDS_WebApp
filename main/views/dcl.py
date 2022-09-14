@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.views import View
 from ..forms import TaskForm
+from ..models.task import Task
 
 class Dcl(View):
     def get(self, request):
@@ -13,5 +14,6 @@ class Dcl(View):
         if task.is_valid():
             task.save()
             # print(task)
-        context = {}
+        tasks_list = Task.objects.all()
+        context = {'task_list': tasks_list}
         return render(request, 'tasks.html', context)

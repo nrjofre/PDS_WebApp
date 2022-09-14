@@ -656,34 +656,6 @@
                 getStageAsStr();
             }
         });
-
-        function getStageAsStr(){
-            // json = stage.toJSON().substr(6372)
-            // json = json.substr(0, json.length-3)
-            // document.getElementById("stageInput").value = json
-            var str = ""
-            for(var i = 0; i < existingShapes.length; i++){
-                str += objectToString(existingShapes[i])
-            }
-            document.getElementById("stageInput").value = str
-        }
-
-        function objectToString(object){
-            var  string = '{'
-            string += '"name": ' + object.name()
-            string += ', '
-            if (object.name() === "forceGroup"){
-                string += '"force": ' + object.children[1].text()
-                string += ', '
-            }
-            string += '"x": ' + object.x()
-            string += ', '
-            string += '"y": ' + object.y()
-            string += ', '
-            string += '"rotation": ' + object.rotation()
-            string += '};'
-            return string
-        }
     </script>
   </body>
 

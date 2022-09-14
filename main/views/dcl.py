@@ -11,7 +11,7 @@ class Dcl(View):
     def post(self, request, *args, **kargs):
         task = TaskForm(request.POST)
         if task.is_valid():
-            # task.save()
-            print(task)
+            task.save()
+            # print(task)
         context = {}
         return render(request, 'tasks.html', context)

@@ -106,8 +106,27 @@
                     x: Math.round(e.target.x() / shadowSnapSize) * shadowSnapSize,
                     y: Math.round(e.target.y() / shadowSnapSize) * shadowSnapSize
                 });
-                console.log(shadowFigure.x());
                 stage.batchDraw();
+            }
+            function deleteTransformers(){
+                transformers.forEach(function (t){
+                    t.destroy();
+                })
+                transformers = []
+                selectedShapes = []
+            }
+
+            function deleteShapes(shapes){
+                for(var j = 0; j < selectedShapes.length; j++){
+                    for(var i =  0; i < existingShapes.length; i++){
+                        if (existingShapes[i] === selectedShapes[j]) {
+                            selectedShapes[j].destroy();
+                            existingShapes[i].destroy();
+                            existingShapes.splice(i, 1);
+                        }
+                    }
+                }
+                
             }
             
 

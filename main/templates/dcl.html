@@ -10,7 +10,7 @@
         {% csrf_token %}
         {{ task.name }}
         <input id="stageInput" type="hidden" name="stage" value="Debug">
-        <input onclick="getStageToList()" type="submit" name="Submit">
+        <input onclick="getStageAsStr()" type="submit" name="Submit">
       </form>
   </div>
 </div>
@@ -68,11 +68,10 @@
     <script>
         const canvasHeight = 600;
         const canvasWidth = 1111;
-        const barShape = 20;
-        const barThickness = barShape/2;
         var GUIDELINE_OFFSET = 5;
         var angle = 0
-        let shapes = []
+        let selectedShapes = []
+        let existingShapes = []
         var rotateToRight = 10
         var rotateToLeft = -10
         let transformers = []
@@ -128,7 +127,7 @@
         });
 
         document.getElementById('addBar-button').addEventListener('click', () => {
-            doubleclickHandler();
+            barShape();
         });
 
         document.getElementById('addSupport-button').addEventListener('click', () => {
@@ -204,7 +203,6 @@
         stage_layer_grid();
 
         let bar = null;
-        let isDrawing = false;
 
         
         stage.on("click", (e) => {
@@ -224,7 +222,7 @@
                 }
                 layer.add(tr);
                 transformers.push(tr);
-                shapes.push(e.target);
+                selectedShapes.push(e.target);
             }
             else if (e.target.attrs.name === "embedment"){
                 tr = new Konva.Transformer({
@@ -233,11 +231,10 @@
                     anchorStroke: 'red',
                     anchorFill: 'lightblue',
                     anchorSize: 10,
-                    enabledAnchors: ['top-center', 'bottom-center'],
                 });
                 layer.add(tr);
                 transformers.push(tr);
-                shapes.push(e.target);
+                selectedShapes.push(e.target);
             }
             else if (e.target.attrs.name === "circle1" || e.target.attrs.name === "circle2"){
                 tr = new Konva.Transformer({
@@ -250,14 +247,10 @@
                 });
                 layer.add(tr);
                 transformers.push(tr);
-                shapes.push(e.target);
+                selectedShapes.push(e.target);
             }
             else {
-                transformers.forEach(function (t){
-                    t.destroy();
-                })
-                transformers = []
-                shapes = []
+                deleteTransformers();
             }
         });
 
@@ -265,8 +258,7 @@
         let clickPositionX = null;
         let clickPositionY = null;
         let shadowFigure;
-        function doubleclickHandler(){
-            isDrawing = true;
+        function barShape(){
             bar = new Konva.Rect({
                 name: "bar",
                 x: stage.getPointerPosition().x,
@@ -289,15 +281,14 @@
                 shadowMove(e, 0);
             });
             layer.add(bar).batchDraw();
+            existingShapes.push(bar);
         }
 
         function embedmentShape(){
-            const embedmentShape = 20;
-            const embedmentThickness = barShape/2;
             var embedment = new Konva.Rect({
                 name: "embedment",
-                x: stage.getPointerPosition().x - embedmentThickness,
-                y: stage.getPointerPosition().y - embedmentThickness,
+                x: stage.getPointerPosition().x,
+                y: stage.getPointerPosition().y,
                 width: 5,
                 height: blockSnapSize*3,
                 fill: "grey",
@@ -305,6 +296,7 @@
                 strokeWidth: 2,
                 draggable: true,
                 strokeScaleEnabled: false,
+                enabledAnchors: [],
                 
             });
               
@@ -320,6 +312,7 @@
         
             // add the triangle shape to the layer
             layer.add(embedment).batchDraw();
+            existingShapes.push(embedment);
         }
 
         function supportShape(){
@@ -356,6 +349,7 @@
             });
 
             layer.add(support).batchDraw();
+            existingShapes.push(support);
         }
         function slidingSupportShape(){
             const width = 4;
@@ -391,15 +385,14 @@
             });
 
               layer.add(slidingSupport).batchDraw();
+              existingShapes.push(slidingSupport);
         }
 
         function ballJointShape(){
-            const embedmentShape = 10;
-            const embedmentThickness = barShape/2;
             var ballJoint = new Konva.Circle({
                 name: "ballJoint",
-                x: stage.getPointerPosition().x - embedmentThickness,
-                y: stage.getPointerPosition().y - embedmentThickness,
+                x: stage.getPointerPosition().x,
+                y: stage.getPointerPosition().y,
                 radius: blockSnapSize/2,
                 fill: '#d5d4d3',
                 stroke: 'black',
@@ -418,6 +411,7 @@
             });
 
             layer.add(ballJoint).batchDraw();
+            existingShapes.push(ballJoint);
         }
 
         function lineShape(){
@@ -478,6 +472,7 @@
             group.add(line);
             group.add(textNode);
             layer.add(group).batchDraw();
+            existingShapes.push(group);
         }
 
         function connectingRodShape(){
@@ -597,6 +592,7 @@
 
             group.add(force);
             group.add(textNode);
+            existingShapes.push(group);
             layer.add(group).batchDraw();
         }
 
@@ -653,21 +649,40 @@
 
         const DELTA = 4;
         container.addEventListener('keydown', (e) => {
-            console.log(e.key);
             if (e.key === "Backspace" || e.key === 'Delete'){
-                e.preventDefault()
-                for(var i = 0; i < shapes.length; i++){
-                    transformers[i].destroy();
-                    shapes[i].destroy();
-                }
-                transformers = []
-                shapes = []
+                e.preventDefault();
+                deleteShapes(selectedShapes);
+                deleteTransformers();
+                getStageAsStr();
             }
         });
-        function getStageToList(){
-            json = stage.toJSON().substr(6372)
-            json = json.substr(0, json.length-3)
-            document.getElementById("stageInput").value = json
+
+        function getStageAsStr(){
+            // json = stage.toJSON().substr(6372)
+            // json = json.substr(0, json.length-3)
+            // document.getElementById("stageInput").value = json
+            var str = ""
+            for(var i = 0; i < existingShapes.length; i++){
+                str += objectToString(existingShapes[i])
+            }
+            document.getElementById("stageInput").value = str
+        }
+
+        function objectToString(object){
+            var  string = '{'
+            string += '"name": ' + object.name()
+            string += ', '
+            if (object.name() === "forceGroup"){
+                string += '"force": ' + object.children[1].text()
+                string += ', '
+            }
+            string += '"x": ' + object.x()
+            string += ', '
+            string += '"y": ' + object.y()
+            string += ', '
+            string += '"rotation": ' + object.rotation()
+            string += '};'
+            return string
         }
     </script>
   </body>

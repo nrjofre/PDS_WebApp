@@ -206,6 +206,7 @@
         let bar = null;
         let isDrawing = false;
 
+        
         stage.on("click", (e) => {
             shape = e.target;
             if (e.target.attrs.name === "bar" || e.target.attrs.name === "support" || e.target.attrs.name === "force" 
@@ -216,8 +217,11 @@
                     anchorStroke: 'red',
                     anchorFill: 'lightblue',
                     anchorSize: 10,
-                    enabledAnchors: ['middle-left', 'middle-right'],
+                    enabledAnchors: [],
                 });
+                if (e.target.attrs.name === "bar"){
+                    tr.enabledAnchors(['middle-left', 'middle-right'])
+                }
                 layer.add(tr);
                 transformers.push(tr);
                 shapes.push(e.target);
@@ -279,10 +283,10 @@
                 shadowStart(e);
             });
             bar.on('dragend', (e) => {
-                shadowEnd(e);
+                shadowEnd(e, 0);
             });
             bar.on('dragmove', (e) => {
-                shadowMove(e);
+                shadowMove(e, 0);
             });
             layer.add(bar).batchDraw();
         }
@@ -295,7 +299,7 @@
                 x: stage.getPointerPosition().x - embedmentThickness,
                 y: stage.getPointerPosition().y - embedmentThickness,
                 width: 5,
-                height: 50,
+                height: blockSnapSize*3,
                 fill: "grey",
                 stroke: "black",
                 strokeWidth: 2,
@@ -308,10 +312,10 @@
                 shadowStart(e);
             });
             embedment.on('dragend', (e) => {
-                shadowEnd(e);
+                shadowEnd(e, 0);
             });
             embedment.on('dragmove', (e) => {
-                shadowMove(e);
+                shadowMove(e, 0);
             });
         
             // add the triangle shape to the layer
@@ -319,19 +323,27 @@
         }
 
         function supportShape(){
-            const embedmentShape = 15;
-            const embedmentThickness = barShape/2;
-            var support = new Konva.RegularPolygon({
+            const width = 4
+            var support = new Konva.Shape({
                 name: "support",
-                x: stage.getPointerPosition().x - embedmentThickness,
-                y: stage.getPointerPosition().y - embedmentThickness,
-                sides: 3,
-                radius: 15,
+                x: stage.getPointerPosition().x,
+                y: stage.getPointerPosition().y,
                 fill: '#d5d4d3',
                 stroke: 'black',
-                strokeWidth: 2,
+                strokeWidth: width,
                 draggable: true,
                 strokeScaleEnabled: false,
+                sceneFunc: (ctx, shape) => {
+                    ctx.beginPath();
+                    ctx.moveTo(0, width);
+                    ctx.lineTo((blockSnapSize-width)/2, (blockSnapSize));
+                    ctx.lineTo(-(blockSnapSize-width)/2, (blockSnapSize));
+                    ctx.closePath();
+                    // first stroke
+                    ctx.strokeShape(shape);
+                    // then fill
+                    ctx.fillShape(shape);
+                }
             });
             support.on('dragstart', (e) => {
                 shadowStart(e);
@@ -346,34 +358,27 @@
             layer.add(support).batchDraw();
         }
         function slidingSupportShape(){
-            const embedmentShape = 15;
-            const embedmentThickness = barShape/2;
-            //var slidingSupport = new Konva.Shape({
-                //sceneFunc: function (context, shape) {
-                //context.beginPath();
-                //context.moveTo(stage.getPointerPosition().x - embedmentThickness, stage.getPointerPosition().y - embedmentThickness);
-                //context.lineTo(stage.getPointerPosition().x - embedmentThickness + 30, stage.getPointerPosition().y - embedmentThickness);
-                //context.lineTo(stage.getPointerPosition().x - embedmentThickness + 15, stage.getPointerPosition().y - embedmentThickness - 15);
-                //context.closePath();
-
-                //context.beginPath();
-                //context.moveTo(stage.getPointerPosition().x - embedmentThickness + 15, stage.getPointerPosition().y - embedmentThickness);
-                //context.closePath();
-
-          // (!) Konva specific method, it is very important
-                //context.fillStrokeShape(shape);
-                //},
-            var slidingSupport = new Konva.RegularPolygon({
+            const width = 4;
+            var slidingSupport = new Konva.Shape({
                 name: "slidingSupport",
-                x: stage.getPointerPosition().x - embedmentThickness,
-                y: stage.getPointerPosition().y - embedmentThickness,
-                sides: 3,
-                radius: 15,
+                x: stage.getPointerPosition().x,
+                y: stage.getPointerPosition().y,
                 fill: '#dfaf1a',
                 stroke: 'black',
-                strokeWidth: 2,
+                strokeWidth: 4,
                 draggable: true,
                 strokeScaleEnabled: false,
+                sceneFunc: (ctx, shape) => {
+                    ctx.beginPath();
+                    ctx.moveTo(0, width);
+                    ctx.lineTo((blockSnapSize-width)/2, (blockSnapSize));
+                    ctx.lineTo(-(blockSnapSize-width)/2, (blockSnapSize));
+                    ctx.closePath();
+                    // first stroke
+                    ctx.strokeShape(shape);
+                    // then fill
+                    ctx.fillShape(shape);
+                }
               });
             slidingSupport.on('dragstart', (e) => {
                 shadowStart(e);
@@ -395,7 +400,7 @@
                 name: "ballJoint",
                 x: stage.getPointerPosition().x - embedmentThickness,
                 y: stage.getPointerPosition().y - embedmentThickness,
-                radius: 10,
+                radius: blockSnapSize/2,
                 fill: '#d5d4d3',
                 stroke: 'black',
                 strokeWidth: 2,

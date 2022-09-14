@@ -80,6 +80,7 @@
                 integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
                 crossorigin="anonymous"></script>
         <script>
+            var shadowSnapSize = blockSnapSize/2;
             function shadowStart(e){
                 shadowFigure = e.target.clone({
                     fill: '#FF7B17',
@@ -94,17 +95,18 @@
             };
             function shadowEnd(e){
                 e.target.position({
-                x: Math.round(e.target.x() / blockSnapSize) * blockSnapSize,
-                y: Math.round(e.target.y() / blockSnapSize) * blockSnapSize
+                    x: Math.round(e.target.x() / shadowSnapSize) * shadowSnapSize,
+                    y: Math.round(e.target.y() / shadowSnapSize) * shadowSnapSize
                 });
                 stage.batchDraw();
                 shadowFigure.destroy();
             }
             function shadowMove(e){
                 shadowFigure.position({
-                x: Math.round(e.target.x() / blockSnapSize) * blockSnapSize,
-                y: Math.round(e.target.y() / blockSnapSize) * blockSnapSize
+                    x: Math.round(e.target.x() / shadowSnapSize) * shadowSnapSize,
+                    y: Math.round(e.target.y() / shadowSnapSize) * shadowSnapSize
                 });
+                console.log(shadowFigure.x());
                 stage.batchDraw();
             }
             

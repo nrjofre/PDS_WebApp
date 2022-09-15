@@ -1,0 +1,808 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h1>Determinar cuerpos DCL</h1>
+<p>
+    Divida el cuerpo rigido en varios DCL.
+</p>
+<div id="tool-menu">
+  <div>
+      <button id="rotateLeft-button">Rotate Left</button> <button id="rotateRight-button">Rotate Right</button>
+  </div>
+</div>
+<div id="konva-holder"></div>
+    <head>
+        <script src="https://unpkg.com/konva@8.3.12/konva.min.js"></script>
+        <meta charset="utf-8" />
+        <style>
+        body {
+            margin: 10;
+            padding: 10;
+            overflow: hidden;
+            background-color: #f0f0f0;
+        }
+
+
+        #menu {
+            display: none;
+            position: absolute;
+            width: 60px;
+            background-color: white;
+            box-shadow: 0 0 5px grey;
+            border-radius: 3px;
+        }
+
+        #menu button {
+            width: 100%;
+            background-color: white;
+            border: none;
+            margin: 0;
+            padding: 10px;
+        }
+
+        #menu button:hover {
+            background-color: lightgray;
+        }
+        .button {
+            background-color: #008CBA; /* Blue */
+            border: none;
+            color: white;
+            padding: 3px 32px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 13px;
+        }
+        </style>
+  </head>
+
+  <body class="scrollable">
+    <div id="container"></div>
+
+    <a class="button button" href="../ddcl">Next</a>
+
+    <div id="menu">
+      <div>
+        <button id="addBar-button">Insert Bar</button>
+        <button id="addSupport-button">Add Support</button>
+        <button id="addSlidingSupport-button">Add Sliding Support</button>
+        <button id="addBallJoint-button">Add Ball Joint</button>
+        <button id="addConnectingRod-button">Add Connecting Rod</button>
+        <button id="addEmbedment-button">Add Embedment</button>
+        <button id="addLine-button">Add Line</button>
+        <button id="addForce-button">Add Force</button>
+        <button id="delete-button">Delete Object</button>
+      </div>
+    </div>
+    <script>
+        const canvasHeight = 600;
+        const canvasWidth = 1111;
+        var GUIDELINE_OFFSET = 5;
+        var angle = 0
+        let selectedShapes = []
+        let existingShapes = []
+        var rotateToRight = 10
+        var rotateToLeft = -10
+        let transformers = []
+        var position = {x: 80, y: 45}
+        let shape = null;
+        var width = window.innerWidth;
+        var height = window.innerHeight;
+        var shadowOffset = 20;
+        var tween = null;
+        var blockSnapSize = 30;
+
+        function drawLinesSolution1(layer){      
+            var gridLayer = new Konva.Layer();
+            var padding = blockSnapSize;
+            for (var i = 0; i < 100000 / padding; i++) {
+            gridLayer.add(new Konva.Line({
+                points: [Math.round(i * padding) + 0.5, 0, Math.round(i * padding) + 0.5, 100000],
+                stroke: 'black',
+                strokeWidth: 1,
+            }));
+            }
+
+            gridLayer.add(new Konva.Line({points: [0,0,10,10]}));
+            for (var j = 0; j < 100000 / padding; j++) {
+            gridLayer.add(new Konva.Line({
+                points: [0, Math.round(j * padding), 100000, Math.round(j * padding)],
+                stroke: 'black',
+                strokeWidth: 0.5,
+            }));
+            }
+            // var layer = new Konva.Layer();
+            // newRectangle(blockSnapSize * 3, blockSnapSize * 3, layer, stage);
+            // newRectangle(blockSnapSize * 10, blockSnapSize * 3, layer, stage);
+
+            stage.add(gridLayer);
+            // stage.add(layer);
+        }
+
+        let currentShape;
+        var menuNode = document.getElementById('menu');
+        document.getElementById('delete-button').addEventListener('click', () => {
+            if (shape.name() === "stage"){
+                return;
+            }
+            else if (shape.name() === "circle1" || shape.name() === "circle2" || shape.name() === "line" || shape.name() === "bar"){
+                currentShape.parent.destroy();
+            }
+            currentShape.destroy();
+        });
+
+        document.getElementById('addEmbedment-button').addEventListener('click', () => {
+            embedmentShape();
+        });
+
+        document.getElementById('addBar-button').addEventListener('click', () => {
+            barShape();
+        });
+
+        document.getElementById('addSupport-button').addEventListener('click', () => {
+            supportShape();
+        });
+
+        document.getElementById('addSlidingSupport-button').addEventListener('click', () => {
+            slidingSupportShape();
+        });
+
+        document.getElementById('addBallJoint-button').addEventListener('click', () => {
+            ballJointShape();
+        });
+
+        document.getElementById('addLine-button').addEventListener('click', () => {
+            lineShape();
+        });
+
+        document.getElementById('addConnectingRod-button').addEventListener('click', () => {
+            connectingRodShape();
+        });
+
+        document.getElementById('addForce-button').addEventListener('click', () => {
+            forceShape();
+        });
+
+        document.getElementById('rotateRight-button').addEventListener('click', () => {
+            rotateRight();
+        });
+
+        document.getElementById('rotateLeft-button').addEventListener('click', () => {
+            rotateLeft();
+        });
+
+        window.addEventListener('click', () => { 
+                menuNode.style.display = 'none'; 
+            }
+        );
+
+        function ctxtmenu(e){
+            e.evt.preventDefault();
+
+            currentShape = e.target; // if there is one 
+
+            var containerRect = stage.container().getBoundingClientRect();
+            menuNode.style.width = '150px';
+            menuNode.style.top = containerRect.top + stage.getPointerPosition().y + 4 + 'px';
+            menuNode.style.left = containerRect.left + stage.getPointerPosition().x + 4 + 'px';
+            menuNode.style.display = 'block';
+        };
+
+        function stage_layer_grid(){
+
+            stage = new Konva.Stage({
+                name: 'stage',
+                height: canvasHeight,
+                width: canvasWidth,
+                container: "konva-holder",
+                visible: true,
+                draggable: true,
+            });
+
+            stage.getContainer().style.border = '1px solid black';
+
+
+            layer = new Konva.Layer();
+            drawLinesSolution1(layer);
+            
+            stage.add(layer);
+            stage.on('contextmenu', ctxtmenu);
+
+        }
+
+        stage_layer_grid();
+
+        let bar = null;
+
+        
+        stage.on("click", (e) => {
+            shape = e.target;
+            if (e.target.attrs.name === "bar" || e.target.attrs.name === "support" || e.target.attrs.name === "force" 
+            || e.target.attrs.name === "line" || e.target.attrs.name === "slidingSupport"){
+                tr = new Konva.Transformer({
+                    nodes: [e.target],
+                    name: e.target.attrs.name,
+                    anchorStroke: 'red',
+                    anchorFill: 'lightblue',
+                    anchorSize: 10,
+                    rotationSnaps: [0, 90, 180, 45],
+                    enabledAnchors: [],
+                });
+                if (e.target.attrs.name === "bar" || e.target.attrs.name === "line"){
+                    tr.enabledAnchors(['middle-left', 'middle-right'])
+                }
+                layer.add(tr);
+                console.log(tr.rotation());
+                tr.parent.children[0].children[1].attrs.text = tr.rotation()
+                transformers.push(tr);
+                selectedShapes.push(e.target);
+            }
+            else if (e.target.attrs.name === "embedment"){
+                tr = new Konva.Transformer({
+                    nodes: [e.target],
+                    name: e.target.attrs.name,
+                    anchorStroke: 'red',
+                    anchorFill: 'lightblue',
+                    anchorSize: 10,
+                });
+                layer.add(tr);
+                transformers.push(tr);
+                selectedShapes.push(e.target);
+            }
+            else if (e.target.attrs.name === "circle1" || e.target.attrs.name === "circle2"){
+                tr = new Konva.Transformer({
+                    nodes: [e.target],
+                    name: "group",
+                    anchorStroke: 'red',
+                    anchorFill: 'lightblue',
+                    anchorSize: 10,
+                    enabledAnchors: [],
+                });
+                layer.add(tr);
+                transformers.push(tr);
+                selectedShapes.push(e.target);
+            }
+            else {
+                deleteTransformers();
+            }
+        });
+
+        
+
+        let clickPositionX = null;
+        let clickPositionY = null;
+        let shadowFigure;
+        function barShape(){
+
+            bar = new Konva.Rect({
+                name: "bar",
+                x: stage.getPointerPosition().x,
+                y: stage.getPointerPosition().y,
+                width: blockSnapSize * 4,
+                height: blockSnapSize,
+                fill: "lightblue",
+                stroke: "black",
+                strokeWidth: 2,
+                strokeScaleEnabled: false,
+            });
+            bar.on('dragstart', (e) => {
+                shadowStart(e);
+            });
+            bar.on('dragend', (e) => {
+                shadowEnd(e, 0);
+            });
+            bar.on('dragmove', (e) => {
+                shadowMove(e, 0);
+            });
+
+            var width = 50;
+            var height = 50;
+
+            var barGroup = new Konva.Group({
+                name: "forceGroup",
+                draggable: true,
+            });
+
+            var force = new Konva.Arrow({
+                name: "force",
+                rotation: 45,
+                x: bar.getX() + blockSnapSize+5,
+                y: bar.getY() - blockSnapSize-20,
+                points: [0, 0, width / 2, height / 2],
+                pointerLength: 10,
+                pointerWidth: 10,
+                fill: '#13861f',
+                stroke: '#13861f',
+                strokeWidth: 10,
+                strokeScaleEnabled: false,
+                draggable:true,
+              });
+              
+            var textNode = new Konva.Text({
+                name: "forceText",
+                text: 'Write the force applied',
+                x: force.getX()-5,
+                y: force.getY()-20,
+                fontSize: 20,
+                draggable: true,
+            });
+
+            var angle = new Konva.Text({
+                name: "angleText",
+                text: bar.rotation(),
+                x: bar.getX() + blockSnapSize*4,
+                y: stage.getPointerPosition().y - 20,
+                fontSize: 20,
+                draggable: true,
+            });
+
+            var large = new Konva.Text({
+                name: "largeText",
+                text: bar.width()/30,
+                x: bar.getX() + blockSnapSize+5,
+                y: bar.getY() + blockSnapSize+5,
+                fontSize: 20,
+                draggable: true,
+            });
+
+            bar.on('transform', function () {
+                angle.text(bar.rotation().toFixed(2));
+                large.text((bar.width().toFixed(2) * bar.scaleX().toFixed(2))/30);
+            });
+
+            textNode.on('dblclick dbltap', () => {
+                var textPosition = textNode.getAbsolutePosition();
+        
+                var stageBox = stage.container().getBoundingClientRect();
+        
+                var areaPosition = {
+                    x: stageBox.left + textPosition.x,
+                    y: stageBox.top + textPosition.y,
+                };
+        
+                var textarea = document.createElement('textarea');
+                document.body.appendChild(textarea);
+        
+                textarea.value = textNode.text();
+                textarea.style.position = 'absolute';
+                textarea.style.top = areaPosition.y + 'px';
+                textarea.style.left = areaPosition.x + 'px';
+                textarea.style.width = textNode.width();
+        
+                textarea.focus();
+        
+                textarea.addEventListener('keydown', function (e) {
+                    if (e.keyCode === 13) {
+                    textNode.text(textarea.value);
+                    document.body.removeChild(textarea);
+                    }
+                });
+            });
+
+            barGroup.add(force);
+            barGroup.add(textNode);
+            barGroup.add(angle);
+            barGroup.add(large);
+            barGroup.add(bar);
+            existingShapes.push(barGroup);
+            layer.add(barGroup).batchDraw();
+            console.log(barGroup);
+            //layer.add(bar).batchDraw();
+            //existingShapes.push(bar);
+        }
+
+        function embedmentShape(){
+            var embedment = new Konva.Rect({
+                name: "embedment",
+                x: stage.getPointerPosition().x,
+                y: stage.getPointerPosition().y,
+                width: 5,
+                height: blockSnapSize*3,
+                fill: "grey",
+                stroke: "black",
+                strokeWidth: 2,
+                draggable: true,
+                strokeScaleEnabled: false,
+                enabledAnchors: [],
+                
+            });
+              
+            embedment.on('dragstart', (e) => {
+                shadowStart(e);
+            });
+            embedment.on('dragend', (e) => {
+                shadowEnd(e, 0);
+            });
+            embedment.on('dragmove', (e) => {
+                shadowMove(e, 0);
+            });
+        
+            // add the triangle shape to the layer
+            layer.add(embedment).batchDraw();
+            existingShapes.push(embedment);
+        }
+
+        function supportShape(){
+            const width = 4
+            var support = new Konva.Shape({
+                name: "support",
+                x: stage.getPointerPosition().x,
+                y: stage.getPointerPosition().y,
+                fill: '#d5d4d3',
+                stroke: 'black',
+                strokeWidth: width,
+                draggable: true,
+                strokeScaleEnabled: false,
+                sceneFunc: (ctx, shape) => {
+                    ctx.beginPath();
+                    ctx.moveTo(0, width);
+                    ctx.lineTo((blockSnapSize-width)/2, (blockSnapSize));
+                    ctx.lineTo(-(blockSnapSize-width)/2, (blockSnapSize));
+                    ctx.closePath();
+                    // first stroke
+                    ctx.strokeShape(shape);
+                    // then fill
+                    ctx.fillShape(shape);
+                }
+            });
+            support.on('dragstart', (e) => {
+                shadowStart(e);
+            });
+            support.on('dragend', (e) => {
+                shadowEnd(e);
+            });
+            support.on('dragmove', (e) => {
+                shadowMove(e);
+            });
+
+            layer.add(support).batchDraw();
+            existingShapes.push(support);
+        }
+        function slidingSupportShape(){
+            const width = 4;
+            var slidingSupport = new Konva.Shape({
+                name: "slidingSupport",
+                x: stage.getPointerPosition().x,
+                y: stage.getPointerPosition().y,
+                fill: '#dfaf1a',
+                stroke: 'black',
+                strokeWidth: 4,
+                draggable: true,
+                strokeScaleEnabled: false,
+                sceneFunc: (ctx, shape) => {
+                    ctx.beginPath();
+                    ctx.moveTo(0, width);
+                    ctx.lineTo((blockSnapSize-width)/2, (blockSnapSize));
+                    ctx.lineTo(-(blockSnapSize-width)/2, (blockSnapSize));
+                    ctx.closePath();
+                    // first stroke
+                    ctx.strokeShape(shape);
+                    // then fill
+                    ctx.fillShape(shape);
+                }
+              });
+            slidingSupport.on('dragstart', (e) => {
+                shadowStart(e);
+            });
+            slidingSupport.on('dragend', (e) => {
+                shadowEnd(e);
+            });
+            slidingSupport.on('dragmove', (e) => {
+                shadowMove(e);
+            });
+
+              layer.add(slidingSupport).batchDraw();
+              existingShapes.push(slidingSupport);
+        }
+
+        function ballJointShape(){
+            var ballJoint = new Konva.Circle({
+                name: "ballJoint",
+                x: stage.getPointerPosition().x,
+                y: stage.getPointerPosition().y,
+                radius: blockSnapSize/2,
+                fill: '#d5d4d3',
+                stroke: 'black',
+                strokeWidth: 2,
+                draggable: true,
+                strokeScaleEnabled: false,
+            });
+            ballJoint.on('dragstart', (e) => {
+                shadowStart(e);
+            });
+            ballJoint.on('dragend', (e) => {
+                shadowEnd(e);
+            });
+            ballJoint.on('dragmove', (e) => {
+                shadowMove(e);
+            });
+
+            layer.add(ballJoint).batchDraw();
+            existingShapes.push(ballJoint);
+        }
+
+        function lineShape(){
+            var group = new Konva.Group({
+                draggable: true,
+            });
+
+            var line = new Konva.Rect({
+                name: "line",
+                x: stage.getPointerPosition().x,
+                y: stage.getPointerPosition().y,
+                width: 70,
+                height: 2,
+                fill: "grey",
+                stroke: "black",
+                strokeScaleEnabled: false,
+              });
+            
+
+            var textNode = new Konva.Text({
+                name: "forceText",
+                text: 'Write the force applied',
+                x: stage.getPointerPosition().x - 40,
+                y: stage.getPointerPosition().y - 20,
+                fontSize: 20,
+                draggable: true,
+            });
+
+            textNode.on('dblclick dbltap', () => {
+                var textPosition = textNode.getAbsolutePosition();
+        
+                var stageBox = stage.container().getBoundingClientRect();
+        
+                var areaPosition = {
+                    x: stageBox.left + textPosition.x,
+                    y: stageBox.top + textPosition.y,
+                };
+        
+                var textarea = document.createElement('textarea');
+                document.body.appendChild(textarea);
+        
+                textarea.value = textNode.text();
+                textarea.style.position = 'absolute';
+                textarea.style.top = areaPosition.y + 'px';
+                textarea.style.left = areaPosition.x + 'px';
+                textarea.style.width = textNode.width();
+        
+                textarea.focus();
+        
+                textarea.addEventListener('keydown', function (e) {
+                    if (e.keyCode === 13) {
+                    textNode.text(textarea.value);
+                    document.body.removeChild(textarea);
+                    }
+                });
+            });
+
+            group.add(line);
+            group.add(textNode);
+            layer.add(group).batchDraw();
+            existingShapes.push(group);
+        }
+
+        function connectingRodShape(){
+            var line1 = new Konva.Rect({
+                name: "line1",
+                x: 22,
+                y: 20,
+                width: 45,
+                height: 1,
+                fill: "grey",
+                stroke: "black",
+                strokeWidth: 1,
+                strokeScaleEnabled: false,
+                draggable: false,
+              });
+
+            var circle1 = new Konva.Circle({
+                name: "circle1",
+                x: 20,
+                y: 20,
+                radius: 6,
+                stroke: 'black',
+                strokeWidth: 2,
+                strokeScaleEnabled: false,
+                draggable: false,
+              });
+
+            var circle2 = new Konva.Circle({
+                name: "circle2",
+                x: 70,
+                y: 20,
+                radius: 6,
+                stroke: 'black',
+                strokeWidth: 2,
+                strokeScaleEnabled: false,
+                draggable: false,
+              });
+            
+            var group = new Konva.Group({
+                name: "group",
+                x: stage.getPointerPosition().x,
+                y: stage.getPointerPosition().y,
+                draggable: true,
+                listening: true,
+                rotation: 90,
+            });
+
+            layer.add(group);
+            group.add(line1);
+            group.add(circle1);
+            group.add(circle2);
+            group.moveToTop();
+            layer.batchDraw();
+        }
+
+
+        function forceShape(){
+            var width = 50;
+            var height = 50;
+
+            var group = new Konva.Group({
+                name: "forceGroup",
+                draggable: true,
+            });
+
+            var force = new Konva.Arrow({
+                name: "force",
+                rotation: 45,
+                x: stage.getPointerPosition().x,
+                y: stage.getPointerPosition().y,
+                points: [0, 0, width / 2, height / 2],
+                pointerLength: 10,
+                pointerWidth: 10,
+                fill: '#13861f',
+                stroke: '#13861f',
+                strokeWidth: 10,
+                strokeScaleEnabled: false,
+              });
+              
+            var textNode = new Konva.Text({
+                name: "forceText",
+                text: force.rotation(),
+                x: stage.getPointerPosition().x - 40,
+                y: stage.getPointerPosition().y - 20,
+                fontSize: 20,
+                draggable: true,
+            });
+            
+            force.on('transform', function () {
+                console.log(force.rotation().toString());
+                textNode.text(force.rotation());
+            });
+
+            textNode.on('dblclick dbltap', () => {
+                var textPosition = textNode.getAbsolutePosition();
+        
+                var stageBox = stage.container().getBoundingClientRect();
+        
+                var areaPosition = {
+                    x: stageBox.left + textPosition.x,
+                    y: stageBox.top + textPosition.y,
+                };
+        
+                var textarea = document.createElement('textarea');
+                document.body.appendChild(textarea);
+        
+                textarea.value = textNode.text();
+                textarea.style.position = 'absolute';
+                textarea.style.top = areaPosition.y + 'px';
+                textarea.style.left = areaPosition.x + 'px';
+                textarea.style.width = textNode.width();
+        
+                textarea.focus();
+        
+                textarea.addEventListener('keydown', function (e) {
+                    if (e.keyCode === 13) {
+                    textNode.text(textarea.value);
+                    document.body.removeChild(textarea);
+                    }
+                });
+            });
+
+            group.add(force);
+            group.add(textNode);
+            existingShapes.push(group);
+            layer.add(group).batchDraw();
+        }
+
+        function rotateAroundPoint(shape, angleDegrees, point) {
+            let angleRadians = angleDegrees * Math.PI / 180; // sin + cos require radians
+            
+            const x =
+              point.x +
+              (shape.x() - point.x) * Math.cos(angleRadians) -
+              (shape.y() - point.y) * Math.sin(angleRadians);
+            const y =
+              point.y +
+              (shape.x() - point.x) * Math.sin(angleRadians) +
+              (shape.y() - point.y) * Math.cos(angleRadians);
+             
+            shape.position({x: x, y: y});  // move the rotated shape in relation to the rotation point.
+            shape.rotation(shape.rotation() + angleDegrees); // rotate the shape in place around its natural rotation point
+            
+        }
+
+        function rotateRight(){
+            if (shape.name() === "stage"){
+                return;
+            }
+            // This is the important call ! Cross is the rotation point as illustrated by crosshairs.
+            rotateAroundPoint(shape, rotateToRight, {x: shape.x(), y: shape.y()});
+            
+            shape.moveToTop(); // ensure the 'tails' shapes do not cover the main shape
+            
+            stage.draw();
+            
+            angle = angle + 10;
+        }
+
+        function rotateLeft(){
+            if (shape.name() === "stage"){
+                return;
+            }
+            // This is the important call ! Cross is the rotation point as illustrated by crosshairs.
+            rotateAroundPoint(shape, rotateToLeft, {x: shape.x(), y: shape.y()});
+            
+            shape.moveToTop(); // ensure the 'tails' shapes do not cover the main shape
+            
+            stage.draw();
+            
+            angle = angle + 10;
+        }
+        container = stage.container();
+        container.tabIndex = 1;
+        // focus it
+        // also stage will be in focus on its click
+        // container.focus();
+
+        const DELTA = 4;
+        container.addEventListener('keydown', (e) => {
+            if (e.key === "Backspace" || e.key === 'Delete'){
+                e.preventDefault();
+                deleteShapes(selectedShapes);
+                deleteTransformers();
+                getStageAsStr();
+            }
+        });
+
+        var scaleBy = 1.1;
+        stage.on('wheel', (e) => {
+        // stop default scrolling
+        e.evt.preventDefault();
+
+        var oldScale = stage.scaleX();
+        var pointer = stage.getPointerPosition();
+
+        var mousePointTo = {
+          x: (pointer.x - stage.x()) / oldScale,
+          y: (pointer.y - stage.y()) / oldScale,
+        };
+
+        // how to scale? Zoom in? Or zoom out?
+        let direction = e.evt.deltaY > 0 ? 1 : -1;
+
+        // when we zoom on trackpad, e.evt.ctrlKey is true
+        // in that case lets revert direction
+        if (e.evt.ctrlKey) {
+          direction = -direction;
+        }
+
+        var newScale = direction > 0 ? oldScale * scaleBy : oldScale / scaleBy;
+
+        stage.scale({ x: newScale, y: newScale });
+
+        var newPos = {
+          x: pointer.x - mousePointTo.x * newScale,
+          y: pointer.y - mousePointTo.y * newScale,
+        };
+        stage.position(newPos);
+
+      });
+
+    </script>
+  </body>
+
+{% endblock %}

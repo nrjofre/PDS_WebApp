@@ -49,8 +49,8 @@
         {% if user.is_authenticated %}
         <div class="sidenav">
             <a href="/">Home</a>
-            <a href="/dcl">Create DCL</a>
-            <a href="/ctask">Create Task</a>             
+            <a href="/ctask">Create Task</a>
+            <a href="/tasks">Available Tasks</a>
             <a href="/logout">Logout</a>
         </div>
         {% else %}
@@ -83,7 +83,7 @@
                 integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
                 crossorigin="anonymous"></script>
         <script>
-            var shadowSnapSize = blockSnapSize/2;
+            var shadowSnapSize = 2/2;
             function shadowStart(e){
                 shadowFigure = e.target.clone({
                     fill: '#FF7B17',

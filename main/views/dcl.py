@@ -14,6 +14,6 @@ class Dcl(View):
         if task.is_valid():
             task.save()
             # print(task)
-        tasks_list = Task.objects.all()
-        context = {'task_list': tasks_list}
-        return render(request, 'tasks.html', context)
+        #tasks_list = Task.objects.all()
+        #context = {'task_list': tasks_list}
+        #return render(request, 'tasks.html', context)

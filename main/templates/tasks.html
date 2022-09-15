@@ -2,7 +2,7 @@
 {% block content %}
 
 
-<h1>Tareas Disponibles</h1>
+<h1>Tasks Available</h1>
 <style>
     .button {
         background-color: #008CBA; /* Blue */
@@ -55,7 +55,7 @@
     <thead>
     <tr>
     <th>Nombre</th>
-    <th>Stage</th>
+    <th>Statement</th>
     <th></th>
     </tr>
     </thead>
@@ -67,7 +67,7 @@
             </td>
             <td style="word-wrap: break-word;
             max-width: 150px;">
-                {{task.stage}}
+                {{task.statement}}
             </td>
             <td>
                 <a class="button button" href="{% url 'dcl'%}">Edit</a>

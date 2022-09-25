@@ -374,6 +374,15 @@
             barGroup.add(angle);
             barGroup.add(large);
             barGroup.add(bar);
+            barGroup.on('dragstart', (e) => {
+                shadowStart(e);
+            });
+            barGroup.on('dragend', (e) => {
+                shadowEnd(e, 0);
+            });
+            barGroup.on('dragmove', (e) => {
+                shadowMove(e, 0);
+            });
             existingShapes.push(barGroup);
             layer.add(barGroup).batchDraw();
             console.log(barGroup);

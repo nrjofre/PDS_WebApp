@@ -14,4 +14,5 @@ urlpatterns = [
     path('ddcl/', ddcl.DDcl.as_view(), name="ddcl"),
     path('eq/', equations.Equations.as_view(), name="eq"),
     path('ctask/', views.CTask.as_view(), name="ctask"),
+    path('users/', views.Users.as_view(), name="users"),
 ]

@@ -1,7 +1,14 @@
 {% extends 'base.html' %}
 {% block content %}
 
-<h1>Ecuaciones de equilibrio</h1>
+{% if user.is_authenticated %}
+    {% load static %}
+    <h1>Ecuaciones de equilibrio</h1>
+    <h4>Statement:</h4>
+
+    <p>{{ task.statement }}</p>
+
+    <img src="/{{ task.image }}">
 <p>
     Basandose en los diagramas realizados escriba las ecuaciones de equilibrio.
     Seleccione elementos del DCL para llevarlo a la ecuación.
@@ -852,5 +859,5 @@
 
     </script>
   </body>
-
+{% endif %}
 {% endblock %}

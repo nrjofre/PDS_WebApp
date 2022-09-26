@@ -1,4 +1,79 @@
 {% extends 'base.html' %}
 {% block content %}
+<h2>{{profile.user.first_name}}'s Profile</h2>
+<table class="table">
+    <thead>
+        <tr>
+          <th scope="col">Category</th>
+          <th scope="col">Score</th>
+        </tr>
+      </thead>
+    <tbody>
+      <tr>
+        <td>Total Score</td>
+        <td>
+            <div class="progress">
+                <div class="progress-bar" role="progressbar" style="width: {{profile.score}}%" aria-valuenow="{{profile.score}}" aria-valuemin="0" aria-valuemax="100">{{profile.score}}</div>
+            </div>
+        </td>
+      </tr>
+      <tr>
+        <td>Apoyo Deslizante</td>
+        <td>
+            <div class="progress">
+                <div class="progress-bar" role="progressbar" style="width: {{profile.apoyo_deslizante}}%" aria-valuenow="{{profile.apoyo_deslizante}}" aria-valuemin="0" aria-valuemax="100">{{profile.apoyo_deslizante}}</div>
+            </div>
+        </td>
+      </tr>
+      <tr>
+        <td>Apoyo Fijo</td>
+        <td>
+            <div class="progress">
+                <div class="progress-bar" role="progressbar" style="width: {{profile.apoyo_fijo}}%" aria-valuenow="{{profile.apoyo_fijo}}" aria-valuemin="0" aria-valuemax="100">{{profile.apoyo_fijo}}</div>
+            </div>
+        </td>
+      </tr>
+      <tr>
+        <td>Empotramiento</td>
+        <td>
+            <div class="progress">
+                <div class="progress-bar" role="progressbar" style="width: {{profile.empotramiento}}%" aria-valuenow="{{profile.empotramiento}}" aria-valuemin="0" aria-valuemax="100">{{profile.empotramiento}}</div>
+            </div>
+        </td>
+      </tr>
+      <tr>
+        <td>Biela</td>
+        <td>
+            <div class="progress">
+                <div class="progress-bar" role="progressbar" style="width: {{profile.biela}}%" aria-valuenow="{{profile.biela}}" aria-valuemin="0" aria-valuemax="100">{{profile.biela}}</div>
+            </div>
+        </td>
+      </tr>
+      <tr>
+        <td>Rotula</td>
+        <td>
+            <div class="progress">
+                <div class="progress-bar" role="progressbar" style="width: {{profile.rotula}}%" aria-valuenow="{{profile.rotula}}" aria-valuemin="0" aria-valuemax="100">{{profile.rotula}}</div>
+            </div>
+        </td>
+      </tr>
+      <tr>
+        <td>Fuerza Distribuida</td>
+        <td>
+            <div class="progress">
+                <div class="progress-bar" role="progressbar" style="width: {{profile.fuerza_distribuida}}%" aria-valuenow="{{profile.fuerza_distribuida}}" aria-valuemin="0" aria-valuemax="100">{{profile.fuerza_distribuida}}</div>
+            </div>
+        </td>
+      </tr>
+      <tr>
+        <td>Fuerza Angular</td>
+        <td>
+            <div class="progress">
+                <div class="progress-bar" role="progressbar" style="width: {{profile.fuerza_angular}}%" aria-valuenow="{{profile.fuerza_angular}}" aria-valuemin="0" aria-valuemax="100">{{profile.fuerza_angular}}</div>
+            </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
 
 {% endblock %}

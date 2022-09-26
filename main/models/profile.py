@@ -1,19 +1,14 @@
 from django.db import models
 from django.contrib.auth.models import User
-from django.db.models.signals import post_save
-from django.dispatch import receiver
 
 class Profile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    score = 0
-    categories_level = {}
-    global_level = 0
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="profile", null=True)
+    score = models.IntegerField(default=0)
 
-@receiver(post_save, sender=User)
-def create_user_profile(sender, instance, created, **kwargs):
-    if created:
-        Profile.objects.create(user=instance)
-
-@receiver(post_save, sender=User)
-def save_user_profile(sender, instance, **kwargs):
-    instance.profile.save()
+    apoyo_deslizante = models.IntegerField(default=0)
+    apoyo_fijo = models.IntegerField(default=0)
+    empotramiento = models.IntegerField(default=0)
+    rotula = models.IntegerField(default=0)
+    viela = models.IntegerField(default=0)
+    fuerza_distribuida = models.IntegerField(default=0)
+    fuerza_angular = models.IntegerField(default=0)

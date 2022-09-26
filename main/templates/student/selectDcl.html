@@ -1,7 +1,13 @@
 {% extends 'base.html' %}
 {% block content %}
+{% if user.is_authenticated %}
+    {% load static %}
+    <h1>Determinar cuerpos DCL</h1>
+    <h4>Statement:</h4>
 
-<h1>Determinar cuerpos DCL</h1>
+    <p>{{ task.statement }}</p>
+
+    <img src="/{{ task.image }}">
 <p>
     Divida el cuerpo rigido en varios DCL.
 </p>
@@ -59,7 +65,7 @@
   <body class="scrollable">
     <div id="container"></div>
 
-    <a class="button button" href="../ddcl">Next</a>
+    <a class="button button" href="{% url 'ddcl' task.id %}">Next</a>
 
     <div id="menu">
       <div>
@@ -804,5 +810,5 @@
 
     </script>
   </body>
-
+{% endif %}
 {% endblock %}

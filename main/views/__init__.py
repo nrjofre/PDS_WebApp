@@ -4,5 +4,5 @@ from .tasks import Tasks
 from .dcl import Dcl
 from .ctask import CTask
 from .users import Users
-#from .profile import Profile
+from .perfil import Perfil
 #from .home import Home

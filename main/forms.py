@@ -28,5 +28,5 @@ class TaskForm(ModelForm):
 class CreateTaskForm(ModelForm):
     class Meta:
         model = Tarea
-        fields = ["name", "statement", "image", "starting_stage", "difficulty"]
+        fields = ["name", "statement", "image", "starting_stage"]
         widgets = {}

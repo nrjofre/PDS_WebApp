@@ -16,7 +16,7 @@ class Command(BaseCommand):
         self.stdout.write('done.')
 
 def delete_users():
-    u1 = User.objects.get(username='piriwin')
+    u1 = User.objects.get(username='user1')
     u1.delete()
 
 def set_users():

@@ -59,14 +59,16 @@
     </thead>
     <tbody>
     {% for user in users_list %}
-        <tr>
-            <td>
-                {{user}}
-            </td>
-            <td>
-                <a class="button button" href="{% url 'dcl'%}">Info</a>
-            </td>
-        </tr>
+        {% if not user.is_staff %}
+            <tr>
+                <td>
+                    {{user}}
+                </td>
+                <td>
+                    <a class="button button" href="{% url 'profile' user.id %}">Info</a>
+                </td>
+            </tr>
+        {% endif %}
     {% endfor %}
     </tbody>
     </table>

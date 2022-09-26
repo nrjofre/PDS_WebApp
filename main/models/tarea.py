@@ -9,7 +9,7 @@ class Tarea(models.Model):
     image = models.ImageField(blank=True, upload_to="images/")
     starting_stage = models.IntegerField(choices=STAGE_CHOICES, default=1)
     difficulty = models.IntegerField(default=1)
-    
+
     apoyo_deslizante = models.IntegerField(default=0)
     apoyo_fijo = models.IntegerField(default=0)
     empotramiento = models.IntegerField(default=0)

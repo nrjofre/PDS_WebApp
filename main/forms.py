@@ -22,7 +22,7 @@ class RegisterForm(UserCreationForm):
 class TaskForm(ModelForm):
     class Meta:
         model = Task
-        fields = ["name", "stage"]
+        fields = ["name", "stage", "tarea"]
         widgets = {'stage': forms.HiddenInput()}
 
 class CreateTaskForm(ModelForm):

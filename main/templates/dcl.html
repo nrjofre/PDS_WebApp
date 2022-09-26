@@ -9,6 +9,7 @@
         {% csrf_token %}
         {{ task.name }}
         <input id="stageInput" type="hidden" name="stage" value="Debug">
+        <input type="hidden" name="tarea" value="{{task_id}}">
         <input onclick="getStageAsStr()" type="submit" name="Submit">
       </form>
   </div>

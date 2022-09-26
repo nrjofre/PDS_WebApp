@@ -76,6 +76,10 @@
                         <td>
                             <a class="button button" href="{% url 'delete_task' task.id %}">Delete</a>
                         </td>
+                        {{ task.dcl }}
+                        <td>
+                            <a class="button button" href="{% url 'dcl' task.id %}">Add DCL</a>
+                        </td>
                         <td>
                             <form action="../ctask/" method="POST">
                                 {% csrf_token %}
@@ -100,7 +104,7 @@
                             {{task.statement}}
                         </td>
                         <td>
-                            <a class="button button" href="{% url 'draw'%}">Solve</a>
+                            <a class="button button" href="{% url 'draw' task.id %}">Solve</a>
                         </td>
                     </tr>
                 {% endfor %}

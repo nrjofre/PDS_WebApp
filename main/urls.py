@@ -7,7 +7,7 @@ from .views.student import drawDcl, selectDcl, ddcl, equations
 urlpatterns = [
     path('register/', views.Register.as_view(), name="register"),
     path('', views.Index.as_view(), name="index"),
-    path('dcl/', views.Dcl.as_view(), name="dcl"),
+    path('dcl/<task_id>', views.Dcl.as_view(), name="dcl"),
     path('tasks/', views.Tasks.as_view(), name="tasks"),
     path('draw/<task_id>', drawDcl.DrawDcl.as_view(), name="draw"),
     path('divide/<task_id>', selectDcl.SelectDcl.as_view(), name="divide"),

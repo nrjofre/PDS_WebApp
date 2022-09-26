@@ -1,19 +1,17 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.views import View
 from ..forms import TaskForm
 from ..models.task import Task
+from ..models.tarea import Tarea
 
 class Dcl(View):
-    def get(self, request):
+    def get(self, request, task_id):
         task = TaskForm()
-        context = {'task': task}
+        context = {'task': task, 'task_id': task_id}
         return render(request, 'dcl.html', context)
 
     def post(self, request, *args, **kargs):
         task = TaskForm(request.POST)
         if task.is_valid():
             task.save()
-            # print(task)
-        #tasks_list = Task.objects.all()
-        #context = {'task_list': tasks_list}
-        #return render(request, 'tasks.html', context)
+            return redirect('../tasks')

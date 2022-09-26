@@ -15,4 +15,6 @@ urlpatterns = [
     path('eq/', equations.Equations.as_view(), name="eq"),
     path('ctask/', views.CTask.as_view(), name="ctask"),
     path('users/', views.Users.as_view(), name="users"),
+    path('ctask/<task_id>', views.CTask.edit, name="edit_task"),
+    path('delete_task/<task_id>', views.CTask.delete_task, name="delete_task"),
 ]

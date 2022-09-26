@@ -3,3 +3,4 @@
 from .command import Command
 from .tarea import Tarea
 from .task import Task
+from .profile import Profile

@@ -43,16 +43,25 @@
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet"
             integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
         <title>{% block title %}DCL ITS{% endblock %}</title>
-    </head>
-
+    </head>    
     <body>
         {% if user.is_authenticated %}
-        <div class="sidenav">
-            <a href="/">Home</a>
-            <a href="/ctask">Create Task</a>
-            <a href="/tasks">Available Tasks</a>
-            <a href="/logout">Logout</a>
-        </div>
+            {% if user.is_staff %}
+            <div class="sidenav">
+                <a href="/">Home</a>
+                <a href="/ctask">Create Task</a>
+                <a href="/tasks">Tasks List</a>
+                <a href="/logout">Logout</a>
+            </div>
+            {% else %}
+            <div class="sidenav">
+                <a href="/">Home</a>
+                <a href="/gettask">Get Task</a>
+                <a href="/tasks">Past Tasks</a>
+                <a href="/logout">Logout</a>
+            </div>
+            {% endif %}
+
         {% else %}
             <div class="sidenav">
                 <a href="/">Home</a>

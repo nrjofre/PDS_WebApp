@@ -1,89 +1,114 @@
 {% extends 'base.html' %}
 {% block content %}
+    {% if user.is_authenticated %}
 
+        <h1>Tasks Available</h1>
+        <style>
+            .button {
+                background-color: #008CBA; /* Blue */
+                border: none;
+                color: white;
+                padding: 3px 32px;
+                text-align: center;
+                text-decoration: none;
+                display: inline-block;
+                font-size: 13px;
+                }
+        </style>
+        <table class="TaskTable">
+            <style>
+                table.TaskTable {
+                    border: 2px solid #FFFFFF;
+                    width: 100%;
+                    text-align: center;
+                    border-collapse: collapse;
+                    }
+                    table.TaskTable td, table.TaskTable th {
+                    border: 0px solid #FFFFFF;
+                    padding: 3px 4px;
+                    }
+                    table.TaskTable tbody td {
+                    font-size: 13px;
+                    }
+                    table.TaskTable tr:nth-child(even) {
+                    background: #D0E4F5;
+                    }
+                    table.TaskTable thead {
+                    background: #FFFFFF;
+                    border-bottom: 4px solid #333333;
+                    }
+                    table.TaskTable thead th {
+                    font-size: 15px;
+                    font-weight: bold;
+                    color: #333333;
+                    text-align: center;
+                    border-left: 2px solid #333333;
+                    }
+                    table.TaskTable thead th:first-child {
+                    border-left: none;
+                    }
 
-<h1>Tasks Available</h1>
-<style>
-    .button {
-        background-color: #008CBA; /* Blue */
-        border: none;
-        color: white;
-        padding: 3px 32px;
-        text-align: center;
-        text-decoration: none;
-        display: inline-block;
-        font-size: 13px;
-        }
-</style>
-<table class="TaskTable">
-    <style>
-        table.TaskTable {
-            border: 2px solid #FFFFFF;
-            width: 100%;
-            text-align: center;
-            border-collapse: collapse;
-            }
-            table.TaskTable td, table.TaskTable th {
-            border: 0px solid #FFFFFF;
-            padding: 3px 4px;
-            }
-            table.TaskTable tbody td {
-            font-size: 13px;
-            }
-            table.TaskTable tr:nth-child(even) {
-            background: #D0E4F5;
-            }
-            table.TaskTable thead {
-            background: #FFFFFF;
-            border-bottom: 4px solid #333333;
-            }
-            table.TaskTable thead th {
-            font-size: 15px;
-            font-weight: bold;
-            color: #333333;
-            text-align: center;
-            border-left: 2px solid #333333;
-            }
-            table.TaskTable thead th:first-child {
-            border-left: none;
-            }
+                    table.TaskTable tfoot td {
+                    font-size: 14px;
+                }
+            </style>
+            <thead>
+            <tr>
+            <th>Nombre</th>
+            <th>Statement</th>
+            <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            {% if user.is_staff %}
+                {% for task in task_list %}
+                    <tr>
+                        <td>
+                            {{task.name}}
+                        </td>
+                        <td style="word-wrap: break-word;
+                        max-width: 150px;">
+                            {{task.statement}}
+                        </td>
+                        <td>
+                            <a class="button button" href="{% url 'edit_task' task.id %}">Edit</a>
+                        </td>
+                        <td>
+                            <a class="button button" href="{% url 'delete_task' task.id %}">Delete</a>
+                        </td>
+                        <td>
+                            <form action="../ctask/" method="POST">
+                                {% csrf_token %}
+                                <input type="hidden" name="name" value="{{ task.name }}">
+                                <input type="hidden" name="statement" value="{{ task.statement }}">
+                                <input type="hidden" name="image" value="{{ task.image }}">
+                                <button type="submit" class="btn btn-success">Duplicate</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% endfor %}
+            {% else %}
+                {% for task in task_list %}
+                    <tr>
+                        <td>
+                            {{task.name}}
+                        </td>
+                        <td style="word-wrap: break-word;
+                        max-width: 150px;">
+                            {{task.statement}}
+                        </td>
+                        <td>
+                            <a class="button button" href="{% url 'draw'%}">Solve</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            {% endif %}
 
-            table.TaskTable tfoot td {
-            font-size: 14px;
-        }
-    </style>
-    <thead>
-    <tr>
-    <th>Nombre</th>
-    <th>Statement</th>
-    <th></th>
-    </tr>
-    </thead>
-    <tbody>
-    {% for task in task_list %}
-        <tr>
-            <td>
-                {{task.name}}
-            </td>
-            <td style="word-wrap: break-word;
-            max-width: 150px;">
-                {{task.statement}}
-            </td>
-            <td>
-                <a class="button button" href="{% url 'dcl'%}">Edit</a>
-            </td>
-            <td>
-                <form action="../ctask/" method="POST">
-                    {% csrf_token %}
-                    <input type="hidden" name="name" value="{{ task.name }}">
-                    <input type="hidden" name="statement" value="{{ task.statement }}">
-                    <input type="hidden" name="image" value="{{ task.image }}">
-                    <button type="submit" class="btn btn-success">Duplicate</button>
-                </form>
-            </td>
-        </tr>
-    {% endfor %}
-    </tbody>
-    </table>
+            </tbody>
+            </table>
+    
+    {% else %}
+        <h1>Please login to see information</h1>
+    {% endif %}
 
 {% endblock %}
